@@ -43,8 +43,6 @@ npm run start
 * 🚧 [Nx: Initialize Nx in an Angular CLI workspace](./exercises/nx-01-initialize-nx.md)
 * 🚧 [Nx: Tasks & Task Pipelines](./exercises/nx-02-task-pipelines.md)
 * 🚧 [Nx: Affected & Caching](./exercises/nx-03-affected-and-caching.md)
-* 🚧 [Nx Best Practices: Scalable Library Architecture](./exercises/nx-05-scalable-architecture-design.md)
-* 🚧 [Nx Best Practices: Module Boundaries](./exercises/nx-06-enforce-module-boundaries.md)
 
 ### 3. Modern Architectures & State Management
 
@@ -56,12 +54,12 @@ Signals
 Signals & Observables
 * [Signal - toSignal](exercises/signal-toSignal.md)
 * [Signal - resource & injectParams](exercises/signal-resource-injectParams.md)
-* [Signal - Automatic Migration](exercises/signal-migration.md)
+* BONUS: [Signal - Automatic Migration](exercises/signal-migration.md)
 
 ### 4. Performance
 
-* [Change Detection: Dirty Check](./exercises/change-detection%20-%20Dirty%20Check.md)
-* [Change Detection: OnPush](./exercises/change-detection%20-%20OnPush.md)
+* BONUS: [Change Detection: Dirty Check](./exercises/change-detection%20-%20Dirty%20Check.md)
+* BONUS: [Change Detection: OnPush](./exercises/change-detection%20-%20OnPush.md)
 * [Change Detection: Signals](./exercises/change-detection%20-%20signals.md)
 * [Change Detection: Zoneless](./exercises/change-detection%20-%20zoneless.md)
 
@@ -77,7 +75,6 @@ Signals & Observables
 * [Network: Preload & Prefetch](./exercises/network-resource-hints-preload-prefetch.md)
 * [Network: Lazy Loading Resources](./exercises/network-lazy-loading.md)
 * [Network: Prefetch LCP Data](./exercises/network-prefetch-lcp-data.md)
-* [Network: Cancel In-Flight Requests](./exercises/network-cancel-requests.md)
 * 🚧 [Network: Image Optimization with NgOptimizedImage](./exercises/ng-optimized-images.md)
 * 🚧 Chrome DevTools MCP
 * 🚧 Performance Engineering Skills
