@@ -37,14 +37,14 @@ npm run start
 
 [0. Project Setup](./exercises/project%20setup.md)
 
-### 2. Current State & Tooling
+### Block 1: Current State & Tooling
 
 * [Angular CLI & esbuild: Bundle Analysis](./exercises/bundle-analysis-coverage_bundle-analyzer.md)
 * 🚧 [Nx: Initialize Nx in an Angular CLI workspace](./exercises/nx-01-initialize-nx.md)
 * 🚧 [Nx: Tasks & Task Pipelines](./exercises/nx-02-task-pipelines.md)
 * 🚧 [Nx: Affected & Caching](./exercises/nx-03-affected-and-caching.md)
 
-### 3. Modern Architectures & State Management
+### Block 2: Signals & Signal Change Detection
 
 Signals
 * [Signal - Introduction](exercises/signal-introduction.md)
@@ -54,27 +54,30 @@ Signals
 Signals & Observables
 * [Signal - toSignal](exercises/signal-toSignal.md)
 * [Signal - resource & injectParams](exercises/signal-resource-injectParams.md)
-* BONUS: [Signal - Automatic Migration](exercises/signal-migration.md)
 
-### 4. Performance
-
-* BONUS: [Change Detection: Dirty Check](./exercises/change-detection%20-%20Dirty%20Check.md)
-* BONUS: [Change Detection: OnPush](./exercises/change-detection%20-%20OnPush.md)
+Signal Change Detection
 * [Change Detection: Signals](./exercises/change-detection%20-%20signals.md)
 * [Change Detection: Zoneless](./exercises/change-detection%20-%20zoneless.md)
 
-### 5. Forms: Signal Forms
+Bonus
+* [Signal - Automatic Migration](exercises/signal-migration.md)
+* [Change Detection: Dirty Check](./exercises/change-detection%20-%20Dirty%20Check.md)
+* [Change Detection: OnPush](./exercises/change-detection%20-%20OnPush.md)
+
+### Block 3: Signal Forms
 
 * [Signal Forms](./exercises/signal-forms.md)
 * 🚧 Signal Forms: Dynamic Form Fields
 
-### 6. AI-Assisted Performance Engineering
+### Block 4: AI-Assisted Performance Engineering
 
+Flame Charts, Network & Images
 * [Performance Tab & Flame Charts](./exercises/performance-tab-flame-charts.md)
 * [Network: Preconnect](./exercises/network-resource-hints-preconnect.md)
 * [Network: Preload & Prefetch](./exercises/network-resource-hints-preload-prefetch.md)
 * [Network: Lazy Loading Resources](./exercises/network-lazy-loading.md)
 * [Network: Prefetch LCP Data](./exercises/network-prefetch-lcp-data.md)
 * 🚧 [Network: Image Optimization with NgOptimizedImage](./exercises/ng-optimized-images.md)
+
 * 🚧 Chrome DevTools MCP
 * 🚧 Performance Engineering Skills
