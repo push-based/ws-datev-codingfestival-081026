@@ -49,10 +49,8 @@ npm run start
 Signals
 * [Signal - Introduction](exercises/signal-introduction.md)
 * [Signal - Computed](exercises/signal-computed.md)
-* [Signal - Effect](exercises/signal-effect.md)
 
 Signals & Observables
-* [Signal - toSignal](exercises/signal-toSignal.md)
 * [Signal - resource & injectParams](exercises/signal-resource-injectParams.md)
 
 Signal Change Detection

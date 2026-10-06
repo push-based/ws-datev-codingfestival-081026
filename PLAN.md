@@ -26,14 +26,12 @@ rewritten · 🆕 does not exist yet.
 |---|---|---|---|---|
 | 15 | signal-introduction | ng-modern | ✅ | |
 | 10 | signal-computed | ng-modern | ✅ | |
-| 10 | signal-effect | ng-modern | ✅ | First to cut if the block runs long. |
-| 10 | signal-toSignal | ng-modern | ✅ | Signals & Observables. |
-| 15 | signal-resource-injectParams | ng-modern | ✅ | Signals & Observables. Rewrites `movie-list-page`. |
+| 20 | signal-resource-injectParams | ng-modern | 🔧 | Signals & Observables / state management. Starts from the observable state, so it works without toSignal; one sentence still refers to "the previous exercise" (toSignal). `stream: ({ request: query })` uses the pre-v20 `request` key — current API is `params`. |
 | 15 | change-detection - signals | ng-modern | ✅ | |
 | 15 | change-detection - zoneless | ng-modern | ✅ | |
 | — | signal-migration, change-detection - Dirty Check, change-detection - OnPush | ng-modern | ✅ | Bonus. |
 
-90 min of exercise time with no slot for slides — this block is the tightest.
+~70 min of exercises, ~20 min left for slides.
 
 ## Block 3 — Signal Forms (90 min)
 
@@ -66,6 +64,8 @@ rewritten · 🆕 does not exist yet.
 2. Nx best practices: demo on an existing workspace; no `libs/` restructuring here.
 3. Checkpoint branches per block — later; for now only `main` (start state).
 4. Block 4 performance exercises are not run hands-on one by one; network-cancel-requests dropped.
+5. Block 2: signal-effect and signal-toSignal cut; resource stays (fits state management).
+6. No new exercises for now — structure only.
 
 ## Open questions
 
@@ -73,6 +73,6 @@ rewritten · 🆕 does not exist yet.
 
 ## Dropped from the sources
 
-ng-modern: inject migration, new control flow, defer, SSR (3), manual CD. perf: CSS, scheduling, event loop,
+ng-modern: signal-effect, signal-toSignal, inject migration, new control flow, defer, SSR (3), manual CD. perf: CSS, scheduling, event loop,
 SSR, user flows, ngZone/zone optimizations, network-cancel-requests. nx: library architecture + module
 boundaries (demo instead), custom plugins/executors/generators, Nx Cloud, atomizer.
