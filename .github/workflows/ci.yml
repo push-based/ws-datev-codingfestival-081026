@@ -34,4 +34,5 @@ jobs:
       - uses: nrwl/nx-set-shas@v4
 
       - run: npx nx format:check
-      - run: npx nx affected -t lint test build
+      # ubuntu-latest has 4 vCPUs (Nx default is 3)
+      - run: npx nx affected -t lint test build --parallel=4
