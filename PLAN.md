@@ -1,6 +1,6 @@
 # Workshop plan (trainer notes — delete before the workshop)
 
-**Base app:** `push-based/ws-ng-modern-enterjs-2026` @ `d2eca9f` — movies app on Angular 22.0.1, `@angular/build:application`
+**Base app:** `push-based/ws-ng-modern-enterjs-2026` @ `d2eca9f` — movies app on Angular 22.0.1 (bumped to 22.2 with the Nx start state — `@nx/angular` 23.3 does not resolve against 22.0.1), `@angular/build:application`
 (esbuild), ngxtension 6, TypeScript 6. Requires node `^22.22.3 || ^24.15.0 || >=26` (from `@angular/core` engines).
 
 **Format:** one day, 4 blocks × 90 min. Each block is a numbered sequence of theory (📖) and exercise (🛠)
@@ -111,7 +111,7 @@ Deck "Monorepos & Nx Core", from "project.json / package.json" up to "Demo & Exe
 - Continuous tasks; task graph (`--graph`).
 
 ### 1.5 🛠 Exercise: task pipelines · 10 min · 🆕
-Source: summer2025 `02-task-pipelines` (run tasks, task graph) rewritten for this workspace (old: [nx-02](exercises/nx-02-task-pipelines.md));
+Source: summer2025 `02-task-pipelines` (run tasks, task graph) rewritten for this workspace (old nx-02, removed — `git show 90dc081:exercises/nx-02-task-pipelines.md`);
 bonus from dfl `exercises/task-dependencies.md`.
 - *Tackles:* first hands-on contact with Nx — run tasks, look at graphs, get a feel for it. No config changes.
 - *Progression:*
@@ -133,7 +133,7 @@ Deck "Monorepos & Nx Core", "affected" up to "Demo & Exercise – Affected & Cac
 
 ### 1.7 🛠 Exercise: affected & caching · 10 min · 🆕
 Source: dfl `exercises/affected-and-caching.md` (movies app + library — closer to us than summer2025 `03`, which uses
-the tuskydesign sample; old copy: [nx-03](exercises/nx-03-affected-and-caching.md)).
+the tuskydesign sample; old copy nx-03, removed — `git show 90dc081:exercises/nx-03-affected-and-caching.md`).
 - *Tackles:* only run what changed, never run the same task twice.
 - *Progression:*
   1. Commit (clean base for `affected`), `npx nx run-many -t lint test build`.
@@ -207,7 +207,9 @@ No exercise — demo of something existing (no slides for AI yet).
 
 ### 1.14 🛠 Exercise: [bundle-analysis-coverage_bundle-analyzer](exercises/bundle-analysis-coverage_bundle-analyzer.md) · 10 min · 🔧
 - *Tackles:* what is in the initial bundle and why. Pre-Nx numbers: `main` ≈ 393 kB raw / 115 kB gzip,
-  `polyfills` (zone.js) ≈ 35 kB; pages are lazy; `main` holds the app shell, rx-angular and both forms modules.
+  $1
+  Start state (Nx, Angular 22.2): initial total 442 kB raw / 119 kB transfer, `main` 239 kB + a shared initial chunk 160 kB;
+  lazy chunks are named `index` now (one per feature library barrel).
 - *Progression:*
   1. Coverage tab on `/list/popular` and a detail page → find unused code in `main`.
   2. `npx nx build movies --stats-json` → read the initial-chunk table in the build output.
@@ -339,12 +341,12 @@ Deck: Angular ChangeDetection In-Depth, up to "Demo & Exercise Time — DirtyChe
 ### 2.10 🛠 Exercise: [Dirty Check](exercises/change-detection%20-%20Dirty%20Check.md) (slim) · 5 min · 🔧
 - *Tackles:* change detection is invisible — make it visible with a counter per component.
 - *Progression:*
-  1. Import the shipped `DirtyCheck` component (`src/app/shared/dirty-check/`) and place `<dirty-check />` in
+  1. Import the shipped `DirtyCheckComponent` (`libs/shared/utils/src/lib/dirty-check/`, `@movies/shared/utils`) and place `<dirty-check />` in
      `AppComponent`, `MovieListPageComponent` and `MovieCardComponent`.
   2. Interact: navigate between categories, open a detail page, hover a card (tilt), toggle dark mode.
 - *Result:* every interaction bumps every counter — all components are `Eager`, zone.js ticks the whole tree.
   The counters stay in place for 2.12 and 2.14.
-- *Rework:* ship the `DirtyCheck` component in the start state (counts `ngDoCheck` into a signal); cut the
+- *Rework:* `DirtyCheckComponent` ships in the start state (done; the exercise text points to it); cut the
   exercise down to "place and observe" — creating the component becomes optional reading.
 
 ### 2.11 📖 zone.js, OnPush, markForCheck, CD with signals
@@ -389,8 +391,8 @@ Deck: Angular ChangeDetection In-Depth, "Can we do better?" up to "Demo & Exerci
 ### 2.14 🛠 Exercise: [change-detection - zoneless](exercises/change-detection%20-%20zoneless.md) · 10 min · 🚧
 - *Tackles:* zone.js is opted in explicitly although zoneless is the default.
 - *Progression:*
-  1. Remove `provideZoneChangeDetection()` from `main.ts` and `main.server.ts`, remove `zone.js` from the
-     polyfills in `angular.json`, `npm uninstall zone.js`.
+  1. Remove `provideZoneChangeDetection()` from `apps/movies/src/main.ts`, remove `zone.js` from the
+     polyfills in `apps/movies/project.json`, `npm uninstall zone.js`.
   2. Observe what breaks: the landing list stays empty — `MovieListPageComponent` sets `this.movies` in a
      `subscribe`; nothing schedules CD. The counters show no tick.
   3. Fix with signals: `movies` and `favoriteMovieIds` → signals, template reads them.
@@ -561,11 +563,8 @@ No exercise.
 
 ## Repo issues to fix before the workshop (independent of exercises)
 
-- `ng lint` fails: ESLint 10 installed, only a legacy `.eslintrc.json`.
-- No `test` target; jest config points to a missing `setup-jest.ts`, jest not installed.
-- `index.html:12` — `href=/assets/…` is missing its opening quote.
-- SSR files exist (`main.server.ts`, `serve:ssr` script) but SSR is not configured in `angular.json`.
-- README node versions are outdated.
+All fixed with the Nx start state: flat ESLint config (`nx run-many -t lint` green), Vitest `test` targets (jest config
+removed), `index.html` quote, SSR leftovers removed, README node versions.
 
 ## Decisions (2026-10-06)
 
@@ -588,7 +587,7 @@ No exercise.
 1. Publish `push-based/ws-datev-codingfestival-081026` on GitHub — public or private?
 2. Block 4 needs agent access for every participant (Claude Code / Copilot / Cursor + Chrome) — what does DATEV allow?
 3. Block 4 reference solutions for lazy loading / `NgOptimizedImage` assume the signal migration (bonus in block 2) — rewrite them for decorator inputs, or make the migration part of the start state for block 4?
-4. All exercises reference the pre-Nx paths (`src/app/...`) — update them once the start state exists.
+4. ~~All exercises reference the pre-Nx paths~~ — updated with the start state.
 
 ## Dropped from the sources
 

@@ -63,7 +63,7 @@
       }
     },
     "serve": {
-      "executor": "@nx/angular:dev-server",
+      "executor": "@angular/build:dev-server",
       "defaultConfiguration": "development",
       "configurations": {
         "production": {
@@ -73,6 +73,9 @@
           "buildTarget": "movies:build:development"
         }
       }
+    },
+    "deploy": {
+      "command": "docker build -f tools/deploy/frontend.Dockerfile --build-arg=APP_NAME=movies . -t ghcr.io/push-based/angular-movies-app:dev"
     }
   },
   "tags": ["scope:movies", "type:app"]

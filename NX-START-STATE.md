@@ -123,15 +123,66 @@ renders the count) in `libs/shared/utils` — **not** placed in any template yet
 
 ## Done when
 
-- [ ] `npx nx serve movies` — app works: list, detail, search, login, my movies, tilt, dark mode
-- [ ] `npx nx run-many -t lint test build` — green; second run fully from cache
-- [ ] `npx nx graph` shows the 14 libraries + app with the edges from the table
-- [ ] adding the scope / type constraints (template: dfl `solutions/libs-arch-enforced` `.eslintrc.json` — it
+- [x] `npx nx serve movies` — app works: list, detail, search, login, my movies, tilt, dark mode
+- [x] `npx nx run-many -t lint test build` — green; second run fully from cache
+- [x] `npx nx graph` shows the 14 libraries + app with the edges from the table
+- [x] adding the scope / type constraints (template: dfl `solutions/libs-arch-enforced` `.eslintrc.json` — it
       uses `type:utils`, we use `type:util`; add `type:app` → `*`) produces exactly: errors for the 2 untagged
       libraries, and after tagging them, the `movies/ui-movie-list` → `movies/data-access` violation. Keep this solution
       config for exercise 1.11.
-- [ ] build output: pages still in lazy chunks; initial chunk size comparable to the baseline from step 1
-- [ ] compat layer intact: `grep -rn "provideZoneChangeDetection\|ChangeDetectionStrategy.Eager" apps libs`
-- [ ] `DirtyCheck` component exists and is exported, not used yet
+- [x] build output: pages still in lazy chunks; initial chunk size comparable to the baseline from step 1
+- [x] compat layer intact: `grep -rn "provideZoneChangeDetection\|ChangeDetectionStrategy.Eager" apps libs`
+- [x] `DirtyCheck` component exists and is exported, not used yet
 - [ ] `rm -rf dist && npx nx run movies:deploy` fails (no `dist`); after `npx nx build movies` it builds the image
-- [ ] every exercise in `exercises/` points to existing paths
+- [x] every exercise in `exercises/` points to existing paths
+
+---
+
+## Outcome (2026-10-07)
+
+Deviations from the steps above, and decisions taken:
+
+- **Angular 22.0.1 → 22.2.x.** `@nx/angular` 23.3 does not install against the 22.0.1 lockfile (npm resolves its
+  optional peers to 22.2 and fails with ERESOLVE). Bumped all Angular packages within `^22`, lockfile regenerated.
+- **Nx 23.3.0**, project names `<scope>-<name>` (e.g. `movies-feature-movie-list`), import paths `@movies/<scope>/<name>`.
+- **Executors:** build `@nx/angular:application`; serve `@angular/build:dev-server` — `@nx/angular:dev-server` requires
+  the webpack-based `@angular-devkit/build-angular`, which we do not want to install for a slide.
+- **Inferred targets:** `lint` (`@nx/eslint/plugin`) and `test` (`@nx/vitest`, `testMode: run`) for every project.
+  Libraries have no `build` target (non-buildable).
+- **Tests:** Vitest via Analog (`vitest-analog`; Nx' `vitest-angular` requires buildable libraries). Nx pins Analog 2.6,
+  which crashes with TypeScript 6 (`cache.has is not a function`) → Analog 2.8. Specs: star-rating, movie-image pipe,
+  `DirtyCheckComponent`; every other library runs with `passWithNoTests`.
+- **Lint:** flat config; rules that flag the intentionally old code (`prefer-inject`, `prefer-on-push-…`, …) are off.
+  `ui-` selector prefix enforced only in `shared-ui-design-system` (as the old `ui/.eslintrc.json` did).
+- **SCSS:** tokens stay in `libs/shared/ui-design-system/src/lib/token`; the app resolves them via
+  `stylePreprocessorOptions.includePaths` → `@use 'token/mixins/flex'`.
+- **util-env:** `Environment`, `ENV_TOKEN`, `provideEnvironment()`, `injectEnv()`; `MovieService` uses `injectEnv()`,
+  `app.config.ts` provides `environment.ts`. `ReadAccessInterceptor` stays in the app and imports `environment` directly.
+- **data-access-auth:** `libs/shared/data-access-auth` (`AuthService`, `AuthGuard`).
+- **SSR removed** (`main.server.ts`, `server.ts`, `app.*.server.ts`, `@angular/ssr`, `express`, …).
+- **Build:** initial total 442 kB (baseline 436 kB): Angular 22.2 splits `main` (239 kB) + one shared initial chunk
+  (160 kB). Lazy chunks are now named `index` (one per feature library barrel).
+- **`deploy`:** image `ghcr.io/push-based/angular-movies-app:dev`, no `dependsOn`, not cached.
+
+### Exercise 1.11 — verified solution config
+
+Replace the `*` constraint in `eslint.config.mjs`:
+
+```js
+depConstraints: [
+  { sourceTag: 'scope:movies', onlyDependOnLibsWithTags: ['scope:movies', 'scope:shared'] },
+  { sourceTag: 'scope:shared', onlyDependOnLibsWithTags: ['scope:shared'] },
+  // step 4: type rules
+  { sourceTag: 'type:app', onlyDependOnLibsWithTags: ['*'] },
+  { sourceTag: 'type:feature', onlyDependOnLibsWithTags: ['type:feature', 'type:data-access', 'type:ui', 'type:util'] },
+  { sourceTag: 'type:data-access', onlyDependOnLibsWithTags: ['type:data-access', 'type:util'] },
+  { sourceTag: 'type:ui', onlyDependOnLibsWithTags: ['type:ui', 'type:util'] },
+  { sourceTag: 'type:util', onlyDependOnLibsWithTags: ['type:util'] },
+],
+```
+
+- scope rules only → 4 errors, all imports of the untagged libs (`app.routes.ts` → feature-not-found;
+  movie-detail-page, movie-card, movie-search-control → util-movie-image)
+- tag them (`movies-util-movie-image`: `scope:movies`, `type:util`; `shared-feature-not-found`: `scope:shared`,
+  `type:feature`) → green
+- add the type rules → exactly one error: `movie-search-control.component.ts` → `@movies/movies/data-access`

@@ -12,7 +12,7 @@ Start by adding the directive to an image tag.
 <details>
     <summary>show solution</summary>
 
-Go to `movie-card.component.html` and modify the img tag to contain following changes:
+Go to the template of `MovieCardComponent` (`libs/movies/ui-movie-list/src/lib/movie-card/movie-card.component.ts`) and modify the img tag to contain following changes:
 
 ```html
   <img class="movie-image"
@@ -61,7 +61,7 @@ DRAFT:
   <summary>IMAGE_LOADER setup</summary>
 
 ```ts
-// app.config.ts
+// apps/movies/src/app/app.config.ts
 
 {
   provide: IMAGE_LOADER,

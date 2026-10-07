@@ -19,7 +19,7 @@ Update all the code that updates the `rotate` field to use the signal `set` or `
   <summary>TiltDirective rotate signal</summary>
 
 ```diff
-// tilt.directive.ts
+// libs/shared/utils/src/lib/tilt.directive.ts
 
 - rotate = 'rotate(0deg)';
 + rotation = signal('rotate(0deg)');
@@ -42,7 +42,7 @@ In order for everything to work, we need to call the signal in the host binding.
   <summary>TiltDirective use signal in {host} decorator style</summary>
 
 ```ts
-// tilt.directive.ts
+// libs/shared/utils/src/lib/tilt.directive.ts
 
 @Directive({
   selector: '[tilt]',
@@ -69,7 +69,7 @@ Because we are using signals, we don't need to call `markForCheck` anymore. Chan
   <summary>TiltDirective remove markForCheck</summary>
 
 ```diff
-// tilt.directive.ts
+// libs/shared/utils/src/lib/tilt.directive.ts
 
 @Directive(...)
 export class TiltDirective {

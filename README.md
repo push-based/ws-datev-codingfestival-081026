@@ -6,8 +6,8 @@ DATEV Coding Festival — 08.10.2026
 
 **System Requirements**
 
-* `node ^20.19.0 || ^22.12.0 || ^24.0.0`
-* `npm > 10`
+* `node ^22.22.3 || ^24.15.0 || >=26`
+* `npm >= 10`
 * Chrome (latest stable)
 
 **Clone and install**
@@ -17,15 +17,22 @@ git clone https://github.com/push-based/ws-datev-codingfestival-081026.git
 
 cd ws-datev-codingfestival-081026
 npm install
-
-# (optional) if the step before didn't work, please try the following
-npm install --force
 ```
 
 **Run the application**
 
 ```bash
-npm run start
+npx nx serve movies
+```
+
+**Workspace**
+
+An [Nx](https://nx.dev) workspace: the app lives in `apps/movies`, the code is split into libraries under
+`libs/<scope>/<name>` (scopes `movies` and `shared`), imported via `@movies/<scope>/<name>`.
+
+```bash
+npx nx graph                       # project graph
+npx nx run-many -t lint test build # run tasks for all projects
 ```
 
 ## Workshop Information
@@ -40,9 +47,10 @@ npm run start
 ### Block 1: Current State & Tooling
 
 * [Angular CLI & esbuild: Bundle Analysis](./exercises/bundle-analysis-coverage_bundle-analyzer.md)
-* 🚧 [Nx: Initialize Nx in an Angular CLI workspace](./exercises/nx-01-initialize-nx.md)
-* 🚧 [Nx: Tasks & Task Pipelines](./exercises/nx-02-task-pipelines.md)
-* 🚧 [Nx: Affected & Caching](./exercises/nx-03-affected-and-caching.md)
+* 🚧 Nx: Task Pipelines
+* 🚧 Nx: Affected & Caching
+* 🚧 Nx: Scalable Workspace Architectures
+* 🚧 Nx: Enforce Module Boundaries
 
 ### Block 2: Signals & Signal Change Detection
 

@@ -41,7 +41,7 @@ we can use the [`esbuild bundle analyzer`](https://esbuild.github.io/analyze/).
 In order to generate the needed output, generate a production build:
 
 ```shell
-ng build --stats-json
+npx nx build movies --stats-json
 ```
 
 The build also tells you about the `initial chunk files`. Those are the ones that
@@ -60,7 +60,7 @@ bundle - but you can have several 100 chunks in enterprise grade applications.
 
 We only want to focus on the `initial chunk files` for an analysis like this.
 
-The build now produces a `dist/ws-ng-perf/stats.json`.
+The build now produces a `dist/apps/movies/stats.json`.
 
 Upload the generated file to the [esbuild bundle analyzer](https://esbuild.github.io/analyze/) and
 inspect the result.

@@ -32,7 +32,7 @@ This will also help to get a deeper understanding of rendering cycles in the con
     <summary>MovieCardComponent OnPush</summary>
 
 ```html
-<!-- movie-card.component.html -->
+<!-- libs/movies/ui-movie-list/src/lib/movie-card/movie-card.component.ts (template) -->
 
 <div class="movie-card">
   <dirty-check />
@@ -41,7 +41,7 @@ This will also help to get a deeper understanding of rendering cycles in the con
 ```
 
 ```ts
-// movie-card.component.ts
+// libs/movies/ui-movie-list/src/lib/movie-card/movie-card.component.ts
 import { ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
@@ -66,7 +66,7 @@ Let's do one more simple but significant change and make our `AppComponent` use 
     <summary>Use ChangeDetection OnPush</summary>
 
 ```typescript
-// app.component.ts
+// apps/movies/src/app/app.component.ts
 
 @Component({
   selector: 'app-root',
@@ -108,15 +108,15 @@ Feel free to ask questions if anything unexpected happens.
 > [!NOTE]
 > This is a bonus exercise, you don't need to complete
 
-You can generate components with `OnPush` by default if you add next content to `angular.json` schematics:
+You can generate components with `OnPush` by default if you add the following to the `generators` section of `nx.json`:
 
 <details>
     <summary>setup schematics to add OnPush automatically</summary>
 
 ```json
 {
-  "schematics": {
-    "@schematics/angular:component": {
+  "generators": {
+    "@nx/angular:component": {
       // other stuff is here as well
       "changeDetection": "OnPush"
     }

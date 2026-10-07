@@ -17,7 +17,7 @@ Start by looking at the code and go to the `AppShellComponent`. You should find 
   <summary>Show snippet</summary>
 
 ```ts
-// app-shell.component.ts
+// libs/movies/feature-app-shell/src/lib/app-shell/app-shell.component.ts
 
 readonly genres$ = this.movieService.getGenres();
 ```
@@ -74,7 +74,7 @@ In `AppShellComponent` change the access from `getGenres()` to `genre$`.
   <summary>Show solution</summary>
 
 ```ts
-// movie-service.ts
+// libs/movies/data-access/src/lib/movie.service.ts
 
 readonly genres$ = this.httpClient
   .get<{ genres: TMDBMovieGenreModel[] }>(
@@ -87,7 +87,7 @@ readonly genres$ = this.httpClient
 ```
 
 ```ts
-// app-shell.component.ts
+// libs/movies/feature-app-shell/src/lib/app-shell/app-shell.component.ts
 
 readonly genres$ = this.movieService.genres$;
 
@@ -106,7 +106,7 @@ start the http call.
   <summary>Show solution</summary>
 
 ```ts
-// app.module.ts
+// apps/movies/src/app/app.config.ts
 
 @NgModule({
   /*other stuff*/

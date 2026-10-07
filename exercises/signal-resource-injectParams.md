@@ -21,7 +21,7 @@ We can use the `injectParams` function to get the `query` parameter as a signal.
   <summary>injectParams</summary>
 
 ```ts
-// src/app/movie/movie-search-page/movie-search-page.component.ts
+// libs/movies/feature-movie-search/src/lib/movie-search-page/movie-search-page.component.ts
 import { injectParams } from 'ngxtension/inject-params';
 
 @Component()
@@ -63,7 +63,7 @@ Now we can create a `movies` resource that will be used to load the movies.
   <summary>resource</summary>
 
 ```ts
-// src/app/movie/movie-search-page/movie-search-page.component.ts
+// libs/movies/feature-movie-search/src/lib/movie-search-page/movie-search-page.component.ts
 import { rxResource } from '@angular/core/rxjs-interop';
 
 @Component()

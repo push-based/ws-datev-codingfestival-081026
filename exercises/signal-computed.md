@@ -14,7 +14,7 @@ Go to `StarRatingComponent` and replace the `_rating` variable with a signal, an
   <summary>_rating to signal</summary>
 
 ```diff
-// src/app/ui/pattern/star-rating/star-rating.component.ts
+// libs/shared/ui-design-system/src/lib/pattern/star-rating/star-rating.component.ts
 
 +import { signal } from '@angular/core';
 
@@ -47,7 +47,7 @@ Move the logic out of Input setter into a computed signal.
   <summary>stars to computed signal</summary>
 
 ```diff
-// src/app/ui/pattern/star-rating/star-rating.component.ts
+// libs/shared/ui-design-system/src/lib/pattern/star-rating/star-rating.component.ts
 
 +import { computed } from '@angular/core';
 
@@ -75,7 +75,7 @@ Remove the logic from the setter as it's not needed anymore.
 
 It should look like this after the change: 
 ```ts
-// src/app/ui/pattern/star-rating/star-rating.component.ts
+// libs/shared/ui-design-system/src/lib/pattern/star-rating/star-rating.component.ts
 
 @Input()
 set rating(rating: number | undefined) {
@@ -95,7 +95,7 @@ Move the logic out of Input setter into a computed signal.
   <summary>tooltipText to computed signal</summary>
 
 ```diff
-// src/app/ui/pattern/star-rating/star-rating.component.ts
+// libs/shared/ui-design-system/src/lib/pattern/star-rating/star-rating.component.ts
 
 +import { computed } from '@angular/core';
 
