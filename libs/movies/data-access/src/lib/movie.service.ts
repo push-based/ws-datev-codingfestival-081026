@@ -126,6 +126,22 @@ export class MovieService {
     );
   }
 
+  /**
+   * A fake backend for the Signal Forms exercises.
+   *
+   * Pretends to save a new favorite on a server: it answers after one second, and the
+   * "moderation" rejects comments that contain the word "spoiler" by throwing an error,
+   * just like an HTTP call that fails. Storing the list stays the component's job.
+   */
+  async addFavorite(
+    favorite: TMDBMovieModel & { comment: string },
+  ): Promise<void> {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (/spoiler/i.test(favorite.comment)) {
+      throw new Error('Our moderators rejected this comment: no spoilers!');
+    }
+  }
+
   getFavorites(): (TMDBMovieModel & { comment: string })[] {
     if (typeof localStorage === 'undefined') return [];
     const movies = localStorage.getItem('my-movies');

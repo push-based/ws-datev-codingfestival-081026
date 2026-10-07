@@ -76,8 +76,15 @@ Bonus
 
 ### Block 3: Signal Forms
 
-- [Signal Forms](./exercises/signal-forms.md)
-- 🚧 Signal Forms: Dynamic Form Fields
+We build **My Movies (Signal Forms)** (`/my-movies-v2`, in the side menu) from an empty shell in its own feature
+library, `libs/movies/feature-my-movies-v2`. The Reactive Forms version (`/my-movies`) stays as it is, for comparison.
+
+- [Signal Forms 1: A first signal form](./exercises/signal-forms-01-first-form.md)
+- [Signal Forms 2: Simple validation](./exercises/signal-forms-02-validation.md)
+- [Signal Forms 3: A real submit](./exercises/signal-forms-03-submit.md)
+- [Signal Forms 4: Dynamic forms](./exercises/signal-forms-04-dynamic-list.md)
+- [Signal Forms 5: A custom form field](./exercises/signal-forms-05-custom-control.md)
+- [Signal Forms 6: Custom validation & dynamic fields](./exercises/signal-forms-06-form-logic.md)
 
 ### Block 4: AI-Assisted Performance Engineering
 

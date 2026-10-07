@@ -47,18 +47,68 @@ import { of, Subject, switchMap } from 'rxjs';
       display: block;
     }
 
-    .results {
+    input {
       width: 100%;
+      padding: 1rem 1.2rem;
+      font: inherit;
+      font-size: var(--text-md);
+      color: var(--palette-text-primary);
+      background: var(--palette-background-default);
+      border: 1px solid var(--palette-divider);
+      border-radius: 0.8rem;
+      outline: none;
+      transition:
+        border-color 150ms ease,
+        box-shadow 150ms ease;
+    }
+
+    input:hover {
+      border-color: var(--palette-action-active);
+    }
+
+    input:focus {
+      border-color: var(--palette-primary-main);
+      box-shadow: 0 0 0 0.3rem rgba(var(--palette-primary-main-rgb), 0.25);
+    }
+
+    .results {
       display: flex;
       flex-direction: column;
+      gap: 0.2rem;
       max-height: 350px;
+      margin-top: 0.6rem;
+      padding: 0.6rem;
       overflow: auto;
+      background: var(--palette-background-paper);
+      border: 1px solid var(--palette-divider);
+      border-radius: 0.8rem;
+      box-shadow: var(--theme-shadow-dropdown);
     }
 
     .movie-result {
       display: flex;
       align-items: center;
-      padding: 0.5rem 1rem;
+      gap: 1.2rem;
+      padding: 0.6rem 0.8rem;
+      font: inherit;
+      font-size: var(--text-md);
+      text-align: left;
+      color: var(--palette-text-primary);
+      background: transparent;
+      border: none;
+      border-radius: 0.6rem;
+      cursor: pointer;
+    }
+
+    .movie-result:hover,
+    .movie-result:focus-visible {
+      background: var(--palette-action-hover);
+      outline: none;
+    }
+
+    .movie-result img {
+      flex: none;
+      border-radius: 0.4rem;
     }
   `,
   changeDetection: ChangeDetectionStrategy.Eager,
