@@ -3,8 +3,8 @@
 **Base app:** `push-based/ws-ng-modern-enterjs-2026` @ `d2eca9f` — movies app on Angular 22.0.1 (bumped to 22.2 with the Nx start state — `@nx/angular` 23.3 does not resolve against 22.0.1), `@angular/build:application`
 (esbuild), ngxtension 6, TypeScript 6. Requires node `^22.22.3 || ^24.15.0 || >=26` (from `@angular/core` engines).
 
-**Format:** one day, 4 blocks × 90 min. Each block is a numbered sequence of theory (📖) and exercise (🛠)
-steps; a theory step may have no exercise after it. Minutes are estimates (assumed), not measured.
+**Format:** one day, 4 blocks × 90 min. Each block is a numbered sequence of theory (📖) and exercise (🛠) or
+trainer demo (🎬) steps; a theory step may have no exercise after it. Minutes are estimates (assumed), not measured.
 
 **Status:** ✅ ready · 🔧 needs a pass · 🚧 must be rewritten · 🆕 does not exist yet.
 
@@ -60,18 +60,17 @@ Theory follows the slide decks in order: "Monorepos & Nx Core" → "Nx - Scalabl
 | 1.2 | 5 | 🛠 | Exercise: project setup | 🔧 |
 | 1.3 | 10 | 📖 | Monorepos & Nx Core — part 1: monorepos → project graph → plugins | — |
 | 1.4 | 8 | 📖 | Monorepos & Nx Core — part 2: project.json → task graph | — |
-| 1.5 | 10 | 🛠 | Exercise: task pipelines | 🆕 |
+| 1.5 | 10 | 🛠 | Exercise: task pipelines | ✅ |
 | 1.6 | 3 | 📖 | Monorepos & Nx Core — part 3: affected | — |
-| 1.7 | 10 | 🛠 | Exercise: affected & caching | 🆕 |
+| 1.7 | 10 | 🛠 | Exercise: affected & caching | ✅ |
 | 1.8 | 10 | 📖 | Nx - Scalable Workspace Architectures | — |
-| 1.9 | 10 | 🛠 | Exercise: scalable workspace architectures (generate a feature library) | 🆕 |
-| 1.10 | 5 | 📖 | Nx Enforce Module Boundaries | — |
-| 1.11 | 8 | 🛠 | Exercise: enforce module boundaries (optional — may be a demo) | 🆕 |
-| 1.12 | 3 | 📖 | Outlook: Nx Cloud & AI agents (demo) | — |
-| 1.13 | 5 | 📖 | The Angular build pipeline | — |
-| 1.14 | 10 | 🛠 | Exercise: bundle analysis | 🔧 |
+| 1.9 | 5 | 📖 | Nx Enforce Module Boundaries | — |
+| 1.10 | 8 | 🛠 | Exercise: enforce module boundaries (optional — may be a demo) | ✅ |
+| 1.11 | 3 | 📖 | Outlook: Nx Cloud & AI agents (demo) | — |
+| 1.12 | 5 | 📖 | The Angular build pipeline | — |
+| 1.13 | 10 | 🛠 | Exercise: bundle analysis | 🔧 |
 
-Sum ≈ 107 min (estimates) — ~17 min over. Candidates: 1.11 as a 3-min demo, shorter intro, 1.13/1.14 shorter.
+Sum ≈ 97 min (estimates) — ~7 min over. Candidates: 1.10 as a 3-min demo, shorter intro, 1.12/1.13 shorter.
 
 ### 1.1 📖 Introduction & the story · 10 min
 - Who we are, agenda, how exercises work (README → one file per exercise, solutions in `<details>`).
@@ -110,20 +109,22 @@ Deck "Monorepos & Nx Core", from "project.json / package.json" up to "Demo & Exe
 - Task dependencies: `dependsOn: ["^build"]`, `nx deploy movies` → build first; `targetDefaults` for `deploy`.
 - Continuous tasks; task graph (`--graph`).
 
-### 1.5 🛠 Exercise: task pipelines · 10 min · 🆕
+### 1.5 🛠 Exercise: [task pipelines](exercises/nx-task-pipelines.md) · 10 min · ✅
 Source: summer2025 `02-task-pipelines` (run tasks, task graph) rewritten for this workspace (old nx-02, removed — `git show 90dc081:exercises/nx-02-task-pipelines.md`);
 bonus from dfl `exercises/task-dependencies.md`.
 - *Tackles:* first hands-on contact with Nx — run tasks, look at graphs, get a feel for it. No config changes.
 - *Progression:*
-  1. `npx nx show project movies --web` → which targets exist, configured vs inferred.
-  2. Run tasks: `npx nx build movies` / `npx nx run movies:build` (both syntaxes), `lint` / `test` for one library.
-  3. Many projects: `npx nx run-many -t lint test`.
-  4. Task graph: `npx nx build movies --graph`, `npx nx run-many -t lint --graph`.
+  1. Open `apps/movies/project.json` → targets are defined here: `build`, `serve`, `deploy`.
+  2. Run tasks: `npx nx build movies` / `npx nx run movies:build` (both syntaxes); then `npx nx test movies` — it
+     works, but there is no `test` in `project.json`. Why?
+  3. `npx nx show project movies --web` → `lint` and `test` are inferred (`@nx/eslint/plugin`, `@nx/vitest`).
+  4. Many projects: `npx nx run-many -t lint test`.
+  5. Task graph: `npx nx build movies --graph`, `npx nx run-many -t lint --graph`.
 - *Bonus — task dependencies:* the start state ships a `deploy` target (Docker image from `dist`, as in dfl) without
   `dependsOn`. Delete `dist`, run `npx nx run movies:deploy` → fails → add `"dependsOn": ["build"]` → runs build
   first; check `--graph`. Without Docker: swap the command for an `echo` (dfl's fallback). Then try more `dependsOn` rules (e.g. deploy → build, test, lint) and validate them in the task graph.
 - *Result:* attendees can run tasks and read the task graph; the bonus shows task dependencies.
-- *Rework:* new exercise text.
+- *Done:* verified on the start state; no-Docker fallback is `ls dist/apps/movies/browser` (fails without a build), not `echo`.
 
 ### 1.6 📖 Monorepos & Nx Core — part 3 · 3 min
 Deck "Monorepos & Nx Core", "affected" up to "Demo & Exercise – Affected & Caching".
@@ -131,7 +132,7 @@ Deck "Monorepos & Nx Core", "affected" up to "Demo & Exercise – Affected & Cac
 - Caching: the deck has no theory slide — explain at the exercise intro (inputs → hash → replay outputs + terminal output),
   or borrow the "Nx Replay" visual from the Nx Cloud deck.
 
-### 1.7 🛠 Exercise: affected & caching · 10 min · 🆕
+### 1.7 🛠 Exercise: [affected & caching](exercises/nx-affected-and-caching.md) · 10 min · ✅
 Source: dfl `exercises/affected-and-caching.md` (movies app + library — closer to us than summer2025 `03`, which uses
 the tuskydesign sample; old copy nx-03, removed — `git show 90dc081:exercises/nx-03-affected-and-caching.md`).
 - *Tackles:* only run what changed, never run the same task twice.
@@ -142,8 +143,8 @@ the tuskydesign sample; old copy nx-03, removed — `git show 90dc081:exercises/
      → the library and everything that depends on it; `npx nx affected -t lint test` → only those run.
   4. Local cache: `npx nx build movies` twice → the second run is replayed from the cache.
 - *Result:* attendees have seen affected and the cache on their own workspace.
-- *Rework:* adapt dfl's text — our libraries have no `build` target, so library-level steps use `lint` / `test`
-  (dfl uses `build` with a buildable `data` lib).
+- *Done:* leaf library is `movies/util-movie-image` (7 affected). Cache step shows `inputs`: after a lib change
+  `test` reruns for all 7 affected projects (`^production`), `lint` only for the changed lib.
 
 ### 1.8 📖 Nx - Scalable Workspace Architectures · 10 min
 Deck "Nx - Scalable Workspace Architectures", up to "Demo & Exercise Time – scalable workspace architectures", plus the recap.
@@ -158,56 +159,44 @@ Deck "Nx - Scalable Workspace Architectures", up to "Demo & Exercise Time – sc
   the split workspace (1.5, 1.7), so the game confirms / explains the structure rather than predicting it.
 - Migration strategy (how this workspace was split); recap: folders = scope, prefixes = type, barrel file = public API.
 - "Exercise Time – Project Setup" marker: skipped (setup was 1.2).
+- **No exercise** after this part — "Demo & Exercise Time" is the "Let's play!" game only (decision 12).
 
-### 1.9 🛠 Exercise: scalable workspace architectures — generate a feature library · 10 min · 🆕
-Replaces the old "split the monolith" exercise — attendees grow the workspace instead of moving files.
-- *Tackles:* generators, library conventions, feature libraries + lazy routes, the graph following the code.
-- *Progression:*
-  1. `npx nx g @nx/angular:library libs/movies/feature-favorites --tags=scope:movies,type:feature`
-     (or via Nx Console) → inspect what the generator created: `project.json`, `index.ts`, tsconfig path.
-  2. Implement a small favorites page: inject `MovieService` from `movies/data-access`, render with `movie-list`
-     from `movies/ui-movie-list` (code in `<details>`).
-  3. Register it lazily in the routes (`loadComponent: () => import('@…/movies/feature-favorites')…`) and add a nav link.
-  4. `npx nx graph` → the new node and its edges; `npx nx affected -t lint test` → it shows up.
-- *Result:* a new feature library, wired the Nx way, without touching existing structure.
-- *Rework:* new exercise; decide the import alias style together with the start state.
-
-### 1.10 📖 Nx Enforce Module Boundaries · 5 min
+### 1.9 📖 Nx Enforce Module Boundaries · 5 min
 Deck "Nx Enforce Module Boundaries", up to "Exercise – Enforce Module Boundaries".
 - Restrict inter-module interactions: app ↛ app, lib ↛ app; by scope, type, platform.
 - Tags in `project.json` (generated with `--tags`); `@nx/enforce-module-boundaries` with `depConstraints` for scope
   and each type; allow list; the "Error" example; demo; summary.
 - Rest of the deck (bloated shared scope, single vs multiple shared libs, secondary entry points, api type) as time allows.
 
-### 1.11 🛠 Exercise: enforce module boundaries · 8 min · 🆕 (optional — may be shown as a demo)
+### 1.10 🛠 Exercise: [enforce module boundaries](exercises/nx-enforce-module-boundaries.md) · 8 min · ✅ (optional — may be shown as a demo)
 Source: summer2025 `06-enforce-module-boundaries`, rewritten for this workspace.
 - *Tackles:* the architecture exists only by convention; one library already violates it. The rule is active but
   allows everything (`*` → `*`).
 - *Progression:*
   1. `npx nx run-many -t lint` → all green.
-  2. Replace the `*` constraint with the scope rules → lint fails for the 2 untagged libraries ("project without tags").
+  2. Replace the `*` constraint with the scope rules → 4 errors, all imports of the 2 untagged libraries.
   3. Tag them → green again.
   4. Add the type rules → the hidden violation appears: `movies/ui-movie-list` (`movie-search-control`) injects
      `MovieService` from `movies/data-access`.
-  5. Discuss the fix (move the control to the feature library, or pass the data in).
+  5. Discuss the fix (move the control into `feature-my-movies`, its only user, or pass the data in).
 - *Result:* the architecture is enforced by the linter.
-- *Rework:* new exercise; the start state is prepared for it either way (demo or hands-on).
+- *Done:* the start state is prepared for it either way (demo or hands-on).
 
-### 1.12 📖 Outlook: Nx Cloud & AI agents · 3 min
+### 1.11 📖 Outlook: Nx Cloud & AI agents · 3 min
 No exercise — demo of something existing (no slides for AI yet).
 - Deck "6. Nx Cloud": Nx Replay (remote cache), Nx Agents (distributed task execution), Nx Cloud interface (RxAngular).
 - Nx and AI agents: `nx configure-ai-agents` (Nx skills + MCP), self-healing CI — bridge to block 4.
 
-### 1.13 📖 The Angular build pipeline · 5 min
+### 1.12 📖 The Angular build pipeline · 5 min
 - `@nx/angular:application` wraps Angular's esbuild-based application builder; Vite for the dev server.
 - Build output: initial chunks (in `index.html`, always downloaded) vs lazy chunks (per route).
 - Why bytes matter: download → parse → execute before first render; delays LCP, blocks the main thread.
 - Budgets as a guard rail — this app has none.
 - Tools: Coverage tab and `--stats-json` + esbuild analyzer.
 
-### 1.14 🛠 Exercise: [bundle-analysis-coverage_bundle-analyzer](exercises/bundle-analysis-coverage_bundle-analyzer.md) · 10 min · 🔧
+### 1.13 🛠 Exercise: [bundle-analysis-coverage_bundle-analyzer](exercises/bundle-analysis-coverage_bundle-analyzer.md) · 10 min · 🔧
 - *Tackles:* what is in the initial bundle and why. Pre-Nx numbers: `main` ≈ 393 kB raw / 115 kB gzip,
-  $1
+  `polyfills` (zone.js) ≈ 35 kB; pages are lazy; `main` holds the app shell, rx-angular and both forms modules.
   Start state (Nx, Angular 22.2): initial total 442 kB raw / 119 kB transfer, `main` 239 kB + a shared initial chunk 160 kB;
   lazy chunks are named `index` now (one per feature library barrel).
 - *Progression:*
@@ -479,85 +468,184 @@ Deck: Angular ChangeDetection In-Depth, "Can we do better?" up to "Demo & Exerci
 
 ## Block 4 — Make it fast: AI-assisted performance engineering (90 min)
 
-> Measure the now-modern app, then let an agent with Chrome DevTools MCP and skills find and fix its problems.
+> First understand performance (render pipeline, Core Web Vitals, DevTools, event loop) — then take an agent for help.
+
+Theory follows the slide decks in order: "Browser Render Pipeline" → "Core Web Vitals" → "Performance Analysis &
+Flame Charts" → "JS Event Loop"; then the AI part (no decks yet). The AI part is **trainer demos** (🎬), no
+hands-on agent setup — attendees may follow along if they have an agent. Skills: **publicly available ones only**.
 
 **Technical aspects, in order**
-1. Core Web Vitals: LCP, INP, CLS — thresholds, LCP sub-parts, INP phases
-2. DevTools Performance panel: trace, flame chart, insights, CPU throttling
-3. MCP: giving an agent tools; Chrome DevTools MCP (traces, insights, network, emulation)
-4. Agent skills: `SKILL.md`, progressive disclosure, official perf skills (`debug-optimize-lcp`)
-5. Fixes: resource hints, image loading / priority, `NgOptimizedImage`, prefetching data at bootstrap
-6. Verify by measuring; compare against the block 1 baseline
+1. Browser render pipeline: scripting → recalc style → layout → paint → composite
+2. Core Web Vitals: LCP (+ breakdown), INP (+ phases), CLS; other vitals; measuring (Performance panel, CrUX)
+3. DevTools Performance panel: recording, throttling, tracks, main thread, tasks / long tasks, timings, frames, search
+4. Event loop: macrotasks, microtasks, rAF, idle callbacks, execution timing
+5. MCP; Chrome DevTools MCP: setup variants, capabilities, recording from a flow description
+6. Streamlining performance analysis with AI: from DevTools AI assistance to agents with skills and framework knowledge
+7. Public skills on the movies app; verify by measuring
 
 | # | Min | | Item | Status |
 |---|---|---|---|---|
-| 4.1 | 15 | 📖 | Web performance essentials | — |
-| 4.2 | 10 | 🛠 | Exercise: guided flame-chart tour | 🔧 |
-| 4.3 | 10 | 📖 | Agents & Chrome DevTools MCP | 🆕 |
-| 4.4 | 20 | 🛠 | Exercise: find the problems with DevTools MCP | 🆕 |
-| 4.5 | 5 | 📖 | Performance skills | 🆕 |
-| 4.6 | 20 | 🛠 | Exercise: fix and verify with skills | 🆕 |
-| 4.7 | 10 | 📖 | Wrap-up & Q&A | — |
+| 4.1 | 5 | 📖 | Browser Render Pipeline | — |
+| 4.2 | 12 | 📖 | Core Web Vitals | — |
+| 4.3 | 3 | 🎬 | Demo: Core Web Vitals live (Performance panel live metrics, CrUX Vis) | — |
+| 4.4 | 10 | 📖 | Performance Analysis & Flame Charts | — |
+| 4.5 | 12 | 🛠 | Exercise: performance tab & flame charts | 🔧 |
+| 4.6 | 8 | 📖 | JS Event Loop | — |
+| 4.7 | 5 | 🛠 | Exercise: event loop (optional) | ✅ |
+| 4.8 | 10 | 📖 | MCP & Chrome DevTools MCP | 🆕 |
+| 4.9 | 10 | 🎬 | Demo: setup, capabilities, recording from a flow description | 🆕 |
+| 4.10 | 5 | 📖 | Streamlining performance analysis with AI | 🆕 |
+| 4.11 | 10 | 🎬 | Demo: public performance skills on the movies app | 🆕 |
+| 4.12 | 5 | 📖 | Wrap-up & Q&A | — |
+| (opt.) | — | 📖 | Network & image optimizations — only if time allows, between 4.7 and 4.8 | — |
 
-### 4.1 📖 Web performance essentials · 15 min
-- Core Web Vitals at p75: LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1.
-- LCP sub-parts: TTFB → resource load delay → resource load duration → element render delay.
-- INP phases: input delay → processing → presentation delay.
-- Performance panel: live metrics, record & reload, flame chart, network track, screenshots, insights
-  sidebar (LCP breakdown, LCP discovery, render-blocking), CPU throttling, annotations.
-- Fix toolbox: `preconnect`, `preload` (with `as`), `prefetch`, `fetchpriority`, `loading="lazy"` (never on
-  the LCP image), `NgOptimizedImage` (`priority`, loaders, `ngSrcset`), starting data requests at bootstrap.
+Sum ≈ 95 min (estimates). If block 3 runs over: 4.7 and 4.3 go first.
 
-### 4.2 🛠 Exercise: guided flame-chart tour · 10 min · 🔧
-Source: [performance-tab-flame-charts](exercises/performance-tab-flame-charts.md), trimmed.
-- *Tackles:* reading a trace — what the agent will produce in 4.2.
+### 4.1 📖 Browser Render Pipeline · 5 min
+Deck "Browser Render Pipeline".
+- Five key areas: scripting → recalculate styles → layout → paint → composite.
+- Layout is the most expensive step (recursive geometry); composite is cheap and can run on the GPU.
+- Every step can introduce jank — know which steps your code triggers: layout property → full reflow, paint
+  property → no layout, compositor property → neither. Aim for compositor-only properties (csstriggers.com).
+
+### 4.2 📖 Core Web Vitals · 12 min
+Deck "Core Web Vitals", up to "Demo & Exercise Time!".
+- LCP (loading, ≤ 2.5 s / 4 s), INP (reactivity, ≤ 200 ms / 500 ms, replaced FID in March 2024), CLS (visual stability, ≤ 0.1 / 0.25).
+- LCP: candidates, LCP vs FCP, CSR vs SSR; LCP breakdown: TTFB → resource load delay → resource load time →
+  element render delay; what causes bad LCP per phase.
+- INP: input delay → processing time → presentation delay; causes: blocking tasks (high TBT), unoptimized or
+  unnecessary code on interactions (tracking, logging), heavy style recalc / layout / paint.
+- CLS: impact fraction × distance fraction; causes and fixes: reserve space, lazy images, lazy-loaded fonts, font style matching.
+- Other vitals: TTFB, FCP, TBT, TTI. Measuring: Performance tab; field data: CrUX, CrUX Vis, RumVision, Treo.
+
+### 4.3 🎬 Demo: Core Web Vitals live · 3 min
+- The deck ends with "Demo & Exercise Time!" — the hands-on part needs the DevTools basics from 4.4, so here only a demo.
+- Performance panel landing view: live LCP / INP / CLS of the movies app while clicking around; CrUX Vis for a public site.
+
+### 4.4 📖 Performance Analysis & Flame Charts · 10 min
+Deck "Performance Analysis & Flame Charts".
+- Don't guess, measure. Open DevTools, start recording (`Ctrl+E`), record a reload (`Ctrl+Shift+E`).
+- Throttling: measure in real conditions (CPU throttling recommended).
+- Overview: filmstrip, tracks (network, main, worker, GPU, frames, timings), main thread, flame chart, summary, minimap.
+- Navigation: select / expand a range, WASD; timeline, tracks and summary are connected.
+- Main track: tasks, task detail view, vertical call stacks, long tasks (> 50 ms) and blocking time; following async tasks.
+- Timings (custom events, DOM events, Web Vitals), frames (16 ms ≈ 60 fps), search (`Ctrl+F`).
+
+### 4.5 🛠 Exercise: [performance-tab-flame-charts](exercises/performance-tab-flame-charts.md) · 12 min · 🔧
+- *Tackles:* black-box performance audit of the movies app with the Performance panel — the same analysis the
+  agent will do in 4.9.
 - *Progression:*
-  1. Record & reload → find LCP and the LCP element (first poster).
-  2. Screenshots: launcher → visible list; mark the range, read the summary.
-  3. Search the flame chart for `MovieListPageComponent` bootstrap.
-  4. CPU throttling → click a nav item → find the INP culprit (`TrackingService.trackEvent`, a 10M-iteration loop).
-- *Result:* everybody can read LCP and INP in a trace.
+  1. Record & reload → find the LCP and the LCP element (first poster); use the insights panel.
+  2. Screenshots: from the loading screen to the visible movie list; mark the range, read the summary.
+  3. Search the flame chart for the `MovieListPageComponent` bootstrap.
+  4. Throttle the CPU, click a nav item → measure the interaction (INP) and find the culprit:
+     `TrackingService.trackEvent`, a 10-million-iteration loop on every nav click.
+  5. (if time) Compare consecutive recordings; save and import a recording.
+- *Result:* everybody can read LCP and INP in a trace — and knows the INP problem the agent should find in 4.9.
+- *Rework:* trim to steps 1–4; check screenshots; paths after the Nx start state.
 
-### 4.3 📖 Agents & Chrome DevTools MCP · 10 min
-- MCP: a standard way to give an agent tools (Claude Code, Cursor, Copilot, …).
-- Chrome DevTools MCP: `performance_start_trace` / `performance_analyze_insight`, `list_network_requests`,
-  console, `emulate` (CPU / network), screenshots, `evaluate_script`.
-- Workflow: trace → read insights → hypothesis → change → re-trace.
-- Limits: lab data only, browser content is exposed to the agent (`--isolated`), CrUX lookups and usage
-  statistics on by default.
-- Angular side: Angular CLI MCP (`ng mcp`: best practices, docs search, `onpush_zoneless_migration`).
+### 4.6 📖 JS Event Loop · 8 min
+Deck "JS Event Loop".
+- The event loop and the macrotask queue: run-to-completion; macrotask sources (DOM events, timers, rAF, idle callbacks, message channel, …).
+- Microtasks (Promise, `queueMicrotask`): run before any other event handling or rendering.
+- Scheduling techniques: `setTimeout` / `setInterval`, `requestIdleCallback`, `requestAnimationFrame`, `scheduler.postTask`.
+- Execution timing overview: task → microtasks → rAF → paint → timers / idle callbacks; "what is executed when?".
 
-### 4.4 🛠 Exercise: find the app's problems with DevTools MCP · 20 min · 🆕
-- *Tackles:* let the agent audit the movies app; participants check its findings against the trace.
-- *Progression:* set up the MCP → ask for an LCP analysis of `/list/popular` → INP analysis of a nav click →
-  CLS on `/movie/533535` → collect findings.
-- *Expected findings (reference solutions):*
+### 4.7 🛠 Exercise: event loop · 5 min · ✅ (optional)
+- *Tackles:* predict the execution order of mixed macro- / microtasks.
+- *Progression:* open the deck's StackBlitz (https://stackblitz.com/edit/js-v6rset?file=index), predict the order, run it, compare
+  with the "Event Loop Exercise" slide.
+- *Result:* attendees can map scheduling APIs to the flame chart.
+
+### 4.8 📖 MCP & Chrome DevTools MCP · 10 min · 🆕 (no deck yet)
+- **MCP in general:** a standard protocol for giving an agent tools — servers expose tools, clients (Claude Code,
+  Copilot, Cursor, Gemini CLI, …) call them. The DevTools MCP gives the agent a browser.
+- **Setup — several ways:**
+  - generic config: `{"command": "npx", "args": ["-y", "chrome-devtools-mcp@latest"]}`
+  - Claude Code: `claude mcp add chrome-devtools --scope user npx chrome-devtools-mcp@latest`, or the plugin
+    (`/plugin marketplace add ChromeDevTools/chrome-devtools-mcp`) which also installs the official skills
+  - VS Code / Copilot: `code --add-mcp '{…}'`; Cursor: Settings → MCP
+  - **take over an existing browser session:** `--autoConnect` (Chrome 144+, enable remote debugging at
+    `chrome://inspect/#remote-debugging`), or `--browser-url` / `--ws-endpoint`
+  - useful flags: `--isolated`, `--headless`, `--channel`, `--viewport`; privacy: `--no-usage-statistics`,
+    `--no-performance-crux` (usage statistics and CrUX lookups are on by default)
+- **Capabilities:** navigation and input (navigate, click, fill), screenshots and accessibility snapshots, console
+  messages with source-mapped stack traces, network requests, performance traces (`performance_start_trace`,
+  `performance_stop_trace`, `performance_analyze_insight` — LCP breakdown, LCP discovery, render-blocking, …),
+  emulation (CPU / network throttling, viewport), `evaluate_script`, Lighthouse audits (a11y, SEO, best practices —
+  not performance), memory heap snapshots.
+- **Limits:** lab data only; the agent sees everything in the browser (use `--isolated`, no sensitive sessions);
+  officially Chrome only.
+
+### 4.9 🎬 Demo: setup, capabilities, recording from a flow description · 10 min · 🆕
+- *Shows:* the MCP setup live and what the agent can do with the movies app.
+- *Progression:*
+  1. Setup live: one variant from 4.8 (e.g. Claude Code + `--autoConnect` to the trainer's running Chrome).
+  2. Capabilities: navigate to `/list/popular`, take a screenshot, read the console, list network requests.
+  3. **Recording from a flow description**, e.g.:
+     > "Open /list/popular with 4x CPU throttling. Record a performance trace while you scroll the list, click
+     > 'Top Rated' and open the first movie. Report LCP, INP and the three longest tasks with their call stacks."
+  4. Compare the agent's findings with the attendees' own trace from 4.5 (`TrackingService.trackEvent`).
+- *Bridge to 4.10:* the prompt works — but it has to be typed again every time, and the agent improvises each run.
+- *Expected findings in the app* (also reference material for the optional network & image part):
 
   | Problem | Evidence in the app | Fix | Reference |
   |---|---|---|---|
+  | Slow nav click (INP) | `TrackingService.trackEvent` busy loop | defer / remove | — |
+  | All posters eager, w780 | `movie-card` `<img>` without `loading` / `fetchpriority` / size | lazy for the rest, eager + high for the first | [lazy-loading](exercises/network-lazy-loading.md) 🔧 needs signal migration (`movie()`, `index()`) |
   | No connection hints | `index.html` has none; 4 origins (api / image TMDB, Google Fonts css / files) | `preconnect` (+ `crossorigin` for api, gstatic) | [preconnect](exercises/network-resource-hints-preconnect.md) ✅ |
   | Font swap → CLS | Poppins loaded late on the detail page | `preload` woff2 | [preload-prefetch](exercises/network-resource-hints-preload-prefetch.md) 🔧 font URLs are `v23`, Google now serves `v24` |
-  | All posters eager, w780 | `movie-card` `<img>` without `loading` / `fetchpriority` / size | lazy for the rest, eager + high for the first | [lazy-loading](exercises/network-lazy-loading.md) 🔧 needs signal migration (`movie()`, `index()`) |
-  | Genres requested from the template | `genres$ = getGenres()` in `AppShellComponent`, `async` in template | `shareReplay` + `provideAppInitializer` | [prefetch-lcp-data](exercises/network-prefetch-lcp-data.md) 🔧 uses `APP_INITIALIZER` / `NgModule` |
+  | Genres requested from the template | `genres$ = getGenres()` in the app shell, `async` in template | `shareReplay` + `provideAppInitializer` | [prefetch-lcp-data](exercises/network-prefetch-lcp-data.md) 🔧 uses `APP_INITIALIZER` / `NgModule` |
   | Images not optimised | no `NgOptimizedImage` | `ngSrc` + `priority`, TMDB loader + `ngSrcset` | [ng-optimized-images](exercises/ng-optimized-images.md) 🔧 missing `NgOptimizedImage` import, step 2 DRAFT |
-  | Slow nav click (INP) | `TrackingService.trackEvent` busy loop | defer / remove | — |
 
-### 4.5 📖 Performance skills · 5 min
-- A skill = folder with `SKILL.md` (name + description + instructions, optional scripts / references);
-  loaded only when the task matches (progressive disclosure). Open standard, supported by most agents.
-- Examples: Chrome's `debug-optimize-lcp`, Angular's `angular-developer` skill.
-- Rule that stays: the agent proposes, the trace decides.
+### 4.10 📖 Streamlining performance analysis with AI · 5 min · 🆕 (no deck yet)
+A ladder — each step gives the AI more structure and less room to guess:
+1. **DevTools AI assistance** — "Ask AI" on a trace or an insight. Zero setup; limited to what is on screen;
+   can be disabled by enterprise policy (check for DATEV).
+2. **Agent + DevTools MCP, ad-hoc prompts** — the 4.9 demo. Flexible, but improvised, not reproducible, token-heavy.
+3. **Agent + skills** — the prompt becomes a skill: a `SKILL.md` (name, description, instructions, optional
+   scripts / references), loaded only when the task matches (progressive disclosure; open standard, supported by
+   most agents). Holds the flow, the measurement protocol (throttling, runs, thresholds) and an analysis checklist.
+4. **Agent + framework knowledge** — Angular CLI MCP (`ng mcp`: best practices, docs search,
+   `onpush_zoneless_migration`), the official Angular skills (`angular-developer`), `AGENTS.md` / best-practices
+   files from angular.dev → fixes in idiomatic Angular instead of generic web advice.
 
-### 4.6 🛠 Exercise: fix and verify with skills · 20 min · 🆕
-- *Tackles:* turn findings from 4.2 into verified fixes.
-- *Progression:* install the DevTools MCP plugin skills → run `debug-optimize-lcp` on `/list/popular` → apply
-  one or two fixes → re-trace with throttling → compare with the block 1 baseline (bundle) and the 4.1 trace.
-- *Result:* measured LCP / INP improvement, made by the agent, verified by the participant.
+**Skills vs. specialized agents** (tiny section):
+- *Skill* — know-how loaded into the **main** agent's context when the task matches; the agent stays the same.
+- *Specialized agent (sub-agent)* — a separate agent with its own instructions, its own tool set (e.g. only the
+  DevTools MCP) and its **own context window**; the main agent delegates "analyse this page" and gets a short report back.
+- Why it matters for performance: traces, network lists and console dumps are huge — a specialized agent keeps them
+  out of the main conversation, can run several analyses in parallel (e.g. one per route), and can be restricted to
+  read-only tools.
+- Combine both: a specialized "performance analyst" agent that uses the performance skills.
+- Most agent tools support them (e.g. Claude Code sub-agents in `.claude/agents/`, custom agents in Copilot / Cursor).
 
-### 4.7 📖 Wrap-up & Q&A · 10 min
+Rule on every step: the agent proposes, the trace decides.
+
+### 4.11 🎬 Demo: public performance skills on the movies app · 10 min · 🆕
+- *Shows:* step 3 + 4 of the ladder with publicly available skills only.
+- *Skills used:*
+  - Chrome DevTools MCP plugin skills (repo `ChromeDevTools/chrome-devtools-mcp`): **`debug-optimize-lcp`** (LCP
+    breakdown → sub-part → fix playbook), `chrome-devtools` (general usage); `memory-leak-debugging`, `a11y-debugging`
+    to mention.
+  - Angular skills (`npx skills add https://github.com/angular/skills`): `angular-developer`; optionally the Angular CLI MCP.
+- *Progression:*
+  1. Show the installed skills and one `SKILL.md` (structure, description, workflow).
+  2. Run `debug-optimize-lcp` on `/list/popular` → the agent walks the LCP breakdown and names the poster image
+     problems (eager w780, no priority).
+  3. Let it apply one fix (with Angular knowledge: e.g. `NgOptimizedImage` + `priority` on the first card).
+  4. Re-record → compare LCP before / after.
+- *Note:* there is no public INP skill — the INP finding stays with the ad-hoc prompt from 4.9 (a good contrast).
+- *Rework:* dry-run the demo on the start state; check which skills the plugin installs at workshop time.
+
+### 4.12 📖 Wrap-up & Q&A · 5 min
 No exercise.
-- Recap along the story: compatibility layer removed, app reactive, forms on signals, measured and faster.
+- Recap along the story: Nx workspace, app reactive and zoneless, forms on signals, measured — and an agent that helps.
 - Further material, questions.
+
+### (optional) 📖 Network & image optimizations
+Only if time allows (between 4.7 and 4.8). No deck listed yet. The network / image exercises in the table under 4.9
+serve as reference solutions, not as hands-on slots.
 
 ---
 
@@ -573,6 +661,7 @@ removed), `index.html` quote, SSR leftovers removed, README node versions.
    (non-buildable); no `nx init` exercise, no library splitting by attendees. See NX-START-STATE.md.
 3. One start state on `main` for the whole day; no checkpoint branches needed for block 1.
 4. Block 4 network / image exercises are reference solutions, not run hands-on one by one; network-cancel-requests dropped.
+   (2026-10-07) Network & image optimizations are optional theory, only if time allows.
 5. Block 2: theory follows the four slide decks unchanged; effect and toSignal are demos only (effect exercise optional).
 6. No new exercises for now — structure only.
 7. Story of the day: remove the app's compatibility layer step by step.
@@ -581,16 +670,19 @@ removed), `index.html` quote, SSR leftovers removed, README node versions.
 10. (2026-10-07) Block 1: theory follows the Nx decks in order (Nx Core → Scalable Workspace Architectures →
    Enforce Module Boundaries), Nx before the Angular build; builds run through the Nx executor (`@nx/angular:application`).
    Module boundaries exercise optional (may be a demo), start state prepared for it.
+11. (2026-10-07) Block 4: theory follows the four performance decks (render pipeline → CWV → performance analysis →
+   event loop); the AI part (DevTools MCP, AI approaches, skills) is trainer demos; only publicly available skills.
+12. (2026-10-07) Block 1: no scalable-workspace-architectures exercise (generate a feature library) — dropped.
 
 ## Open questions
 
 1. Publish `push-based/ws-datev-codingfestival-081026` on GitHub — public or private?
-2. Block 4 needs agent access for every participant (Claude Code / Copilot / Cursor + Chrome) — what does DATEV allow?
-3. Block 4 reference solutions for lazy loading / `NgOptimizedImage` assume the signal migration (bonus in block 2) — rewrite them for decorator inputs, or make the migration part of the start state for block 4?
+2. Block 4 AI part is demo-only; attendees following along need an agent + Chrome — what does DATEV allow? (also: is DevTools AI assistance enabled?)
+3. Block 4 (optional network part) reference solutions for lazy loading / `NgOptimizedImage` assume the signal migration (bonus in block 2) — rewrite them for decorator inputs, or make the migration part of the start state for block 4?
 4. ~~All exercises reference the pre-Nx paths~~ — updated with the start state.
 
 ## Dropped from the sources
 
 ng-modern (as exercises): signal-effect, signal-toSignal, zone.js optimizations, inject migration, new control flow, defer, SSR (3), manual CD.
-perf: CSS, scheduling, event loop, SSR, user flows, ngZone/zone optimizations, network-cancel-requests.
-nx: nx init, library splitting (scalable-architecture-design), custom plugins/executors/generators, Nx Cloud hands-on, DTE, atomizer, cache deep dive.
+perf: CSS, scheduling, SSR, user flows, ngZone/zone optimizations, network-cancel-requests.
+nx: nx init, library splitting (scalable-architecture-design), generate a feature library (old 1.9), custom plugins/executors/generators, Nx Cloud hands-on, DTE, atomizer, cache deep dive.
