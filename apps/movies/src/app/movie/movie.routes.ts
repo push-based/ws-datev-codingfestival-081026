@@ -39,6 +39,14 @@ export const movieRoutes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: 'my-movies-v2',
+    loadComponent: () =>
+      import('@movies/movies/feature-my-movies-v2').then(
+        (m) => m.MyMovieListV2Component,
+      ),
+    canActivate: [AuthGuard],
+  },
+  {
     path: '',
     redirectTo: 'list/popular',
     pathMatch: 'full',

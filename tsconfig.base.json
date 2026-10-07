@@ -51,6 +51,9 @@
       ],
       "@movies/movies/feature-my-movies": [
         "./libs/movies/feature-my-movies/src/index.ts"
+      ],
+      "@movies/movies/feature-my-movies-v2": [
+        "./libs/movies/feature-my-movies-v2/src/index.ts"
       ]
     },
     "rootDir": "."

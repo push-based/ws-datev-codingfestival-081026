@@ -426,10 +426,10 @@ Deck: Angular ChangeDetection In-Depth, "Can we do better?" up to "Demo & Exerci
 
 | # | Min | | Item | Status |
 |---|---|---|---|---|
-| 3.1 | 20 | 📖 | Signal forms | — |
-| 3.2 | 45 | 🛠 | Exercise: signal-forms steps 1–6 | 🔧 |
-| 3.3 | 10 | 📖 | Dynamic forms | — |
-| 3.4 | 15 | 🛠 | Exercise: dynamic form fields | 🆕 |
+| 3.1 | 15 | 📖 | Signal forms | — |
+| 3.2 | 55 | 🛠 | Exercises: signal-forms-01…05 | ✅ |
+| 3.3 | 5 | 📖 | Dynamic forms | — |
+| 3.4 | 15 | 🛠 | Exercise: signal-forms-06 (custom validation & dynamic fields) | ✅ |
 
 ### 3.1 📖 Signal forms · 20 min
 - Short history: template-driven → reactive → typed reactive. Pain points: `FormGroup` tree next to the
@@ -445,23 +445,26 @@ Deck: Angular ChangeDetection In-Depth, "Can we do better?" up to "Demo & Exerci
 - Arrays: an array signal + `applyEach` for per-item rules; iterate the array field in `@for`.
 - Submission: `form(..., { submission: { action } })`, `submit()` returns whether it ran, `reset()`.
 
-### 3.2 🛠 Exercise: [signal-forms](exercises/signal-forms.md) steps 1–6 · 45 min · 🔧
-- *Tackles:* `MyMovieListComponent` (`FormGroup` + inline unique validator, `FormArray` of favorites,
-  `valueChanges` persistence, `markAllAsTouched` / `showError`) and `MovieSearchControlComponent` (a CVA).
+### 3.2 🛠 Exercises: signal-forms-01…05 · 55 min · ✅
+- *Tackles:* nothing to migrate: participants build **My Movies (Signal Forms)** from an empty shell,
+  `libs/movies/feature-my-movies-v2` (`movies-feature-my-movies-v2`, `scope:movies`, `type:feature`), lazy-loaded on
+  `/my-movies-v2` and linked in the side menu. The shell has the markup and styles, the class is empty. The Reactive
+  Forms page (`/my-movies`, `feature-my-movies`) stays untouched as the comparison.
 - *Progression:*
-  1. "Add a movie" `FormGroup` → `addModel` signal + `addForm` with `required`, `minLength` and a custom
-     "already in your list" `validate`.
-  2. Search control: CVA → `FormValueControl` (`value = model()`, `touch` output).
-  3. Favorites `FormArray` → `favorites` array signal + `favoritesForm` with `applyEach`.
-  4. Persistence: `valueChanges` subscription → `effect`.
-  5. Submission into the `form()` options; `reset()`, `removeMovie()`; delete `add()` / `showError()`.
-  6. Template: `[formRoot]`, `[formField]`, inline errors; drop `ReactiveFormsModule` and error templates.
-  Runs as one slot: all steps migrate the same component, it compiles again only after step 6.
-- *Result:* same UI, no `FormGroup`, typed fields, inline errors, persistence via `effect`. Verified: the
-  "Full implementation" compiles on 22.0.1 with `strictTemplates`.
-- *Rework:* step 2 uses `touched = model()` + `touched.set(true)` — v22 only listens to a `touch` output, so
-  the field never becomes touched; participants must log in to reach `/my-movies`; favorites added from the
-  list have no `comment` → `required` fails for them; stray `</content>` / `</invoke>` at the end of the file.
+  1. [A first signal form](exercises/signal-forms-01-first-form.md): `signal` model, `form()`, `[formField]` (the
+     CVA search control works as-is), submit to the console.
+  2. [Simple validation](exercises/signal-forms-02-validation.md): schema, messages, `novalidate` (`[formField]`
+     mirrors `required`/`minlength` onto the element), `touched() && invalid()`, `reset()`, `provideSignalFormsConfig`.
+  3. [A real submit](exercises/signal-forms-03-submit.md): `submission` option, `[formRoot]`, `submitting()`, server
+     errors, `onInvalid` + `focusBoundControl()`. Uses the fake backend `MovieService.addFavorite()` (1 s delay,
+     rejects "spoiler") that ships in `movies/data-access`.
+  4. [Dynamic forms](exercises/signal-forms-04-dynamic-list.md): array signal, `applyEach`, `@for` over the field
+     tree, persistence via `effect`. Favorites liked on the movie list have no `comment`: normalized on load
+     (`[formField]` throws for a missing property).
+  5. [A custom form field](exercises/signal-forms-05-custom-control.md): the search control (`movies/ui-movie-list`)
+     CVA → `FormValueControl`; the Reactive Forms page keeps working with it (`formControlName`, v22).
+- *Result:* each exercise ends with the full code. Verified 2026-10-07 on the Nx start state: every step lints and
+  builds (`nx build movies`), clicked through in the browser.
 
 ### 3.3 📖 Dynamic forms · 10 min
 - Forms whose shape depends on their values — declared in the schema, not by enabling / disabling controls.
@@ -469,10 +472,11 @@ Deck: Angular ChangeDetection In-Depth, "Can we do better?" up to "Demo & Exerci
 - `applyWhen(path, condition, schema)` / `applyWhenValue` (type-guard narrowing for discriminated unions).
 - Adding / removing array items = updating the model signal; the field tree follows.
 
-### 3.4 🛠 Exercise: Signal forms — dynamic form fields · 15 min · 🆕
-- *Tackles:* conditional fields and rules on top of the finished add-movie form.
-- *Progression (proposal):* add a field that is only shown and required under a condition (`hidden` +
-  `applyWhen`) → render it with `@if (!field().hidden())` → verify validation only applies when visible.
+### 3.4 🛠 Exercise: [signal-forms-06](exercises/signal-forms-06-form-logic.md) · 15 min · ✅
+- *Tackles:* custom and conditional logic on top of the finished add-movie form.
+- *Progression:* reusable `uniqueMovie(path, favorites)` rule (re-runs when the list changes) → comment `disabled`
+  until a movie is picked, with a reason → "watched" checkbox shows a `hidden` rating (`required`, `min`, `max`;
+  `@if (!field().hidden())`) → save and show the rating. Bonus: `applyWhen` for low ratings.
 - *Result:* a form whose rules follow the model.
 
 ---

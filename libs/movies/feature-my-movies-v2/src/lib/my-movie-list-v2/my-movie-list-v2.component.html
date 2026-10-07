@@ -1,0 +1,29 @@
+<form>
+  <div class="form-group">
+    <label for="search">Search</label>
+    <app-movie-search-control id="search" />
+  </div>
+  <div class="form-group">
+    <label for="comment">Comment</label>
+    <textarea rows="5" id="comment"></textarea>
+  </div>
+  <div class="button-group">
+    <button class="btn" type="button">Reset</button>
+    <button class="btn primary-button" type="submit">Save</button>
+  </div>
+</form>
+
+<h2>My Movies</h2>
+<div class="my-movies-list">
+  <!-- one row per favorite: exercise 4 turns this into a @for -->
+  <div class="movie-item">
+    <span class="movie-title">Movie title</span>
+    <div class="form-group">
+      <textarea class="movie-comment"></textarea>
+    </div>
+    <button class="btn btn__icon" type="button">
+      <fast-svg name="delete"></fast-svg>
+      Delete
+    </button>
+  </div>
+</div>
