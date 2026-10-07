@@ -10,7 +10,7 @@ Before you start, serve the application, open your browser and the dev tools.
 **Serve**
 
 ```bash
-ng serve --open
+npx nx serve movies --open
 ```
 
 Your application should be served at

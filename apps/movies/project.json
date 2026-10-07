@@ -1,0 +1,82 @@
+{
+  "name": "movies",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/movies/src",
+  "prefix": "",
+  "generators": {
+    "@schematics/angular:component": {
+      "prefix": "",
+      "style": "scss",
+      "standalone": true,
+      "skipTests": true,
+      "inlineTemplate": true,
+      "inlineStyle": true
+    },
+    "@schematics/angular:pipe": {
+      "skipTests": true
+    },
+    "@schematics/angular:service": {
+      "skipTests": true
+    },
+    "@schematics/angular:guard": {
+      "skipTests": true
+    },
+    "@schematics/angular:directive": {
+      "skipTests": true
+    },
+    "@schematics/angular:interceptor": {
+      "skipTests": true
+    }
+  },
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:application",
+      "defaultConfiguration": "production",
+      "outputs": ["{options.outputPath.base}"],
+      "options": {
+        "outputPath": {
+          "base": "dist/apps/movies"
+        },
+        "index": "apps/movies/src/index.html",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/movies/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": ["apps/movies/src/favicon.ico", "apps/movies/src/assets"],
+        "styles": ["apps/movies/src/styles.scss"],
+        "scripts": [],
+        "browser": "apps/movies/src/main.ts",
+        "stylePreprocessorOptions": {
+          "includePaths": ["libs/shared/ui-design-system/src/lib"]
+        }
+      },
+      "configurations": {
+        "production": {
+          "budgets": [],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      }
+    },
+    "serve": {
+      "executor": "@angular/build:dev-server",
+      "defaultConfiguration": "development",
+      "configurations": {
+        "production": {
+          "buildTarget": "movies:build:production"
+        },
+        "development": {
+          "buildTarget": "movies:build:development"
+        }
+      }
+    },
+    "deploy": {
+      "command": "docker build -f tools/deploy/frontend.Dockerfile --build-arg=APP_NAME=movies . -t ghcr.io/push-based/angular-movies-app:dev"
+    }
+  },
+  "tags": ["scope:movies", "type:app"]
+}

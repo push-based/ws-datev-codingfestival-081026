@@ -10,11 +10,14 @@ We will create a little helper component that will assist us to debug change det
 Your task is to create a `DirtyChecksComponent` which should serve as a performance debug utility.
 Whenever the application renders, it should increase a number in its template.
 
-Create it in the `/src/app/shared` folder.
+> [!NOTE]
+> The workspace already ships this component: `DirtyCheckComponent` in
+> `libs/shared/utils/src/lib/dirty-check/dirty-check.component.ts`, exported from `@movies/shared/utils`.
+> Read steps 1 and 2 to understand how it works, then continue with step 3.
 
 ```bash
-# generate component
-ng g c shared/dirty-check
+# how it was generated
+npx nx g @nx/angular:component libs/shared/utils/src/lib/dirty-check/dirty-check
 ```
 
 The component should have a `checked: Signal<number>` as a field and bind it in the template.
@@ -59,7 +62,7 @@ Whenever the `ngDoCheck` lifecycle hook runs, just increase the value of the sig
     <summary>Dirty Checking</summary>
 
 ```typescript
-// src/app/shared/dirty-check.component.ts
+// libs/shared/utils/src/lib/dirty-check/dirty-check.component.ts
 
 import {Component, DoCheck} from "@angular/core";
 
@@ -83,12 +86,12 @@ After each usage, go and check your application and see numbers going wild when 
 
 ### 3.1 Use in `AppComponent` template 
 
-Add import in `app.component.ts` and include it in the imports section
+Add the import in `apps/movies/src/app/app.component.ts` and include it in the imports section
 
 ```typescript
 // Include dirty checks component import here.
 
-import {DirtyCheckComponent} from "./shared/dirty-check/dirty-check.component";
+import { DirtyCheckComponent } from '@movies/shared/utils';
 
 @Component({
     selector: 'app-root',
@@ -98,7 +101,7 @@ import {DirtyCheckComponent} from "./shared/dirty-check/dirty-check.component";
 })
 ```
 
-Add `<dirty-check />` component in `app.component.ts` template:
+Add `<dirty-check />` component in the `AppComponent` template:
 
 ```html
 template: `

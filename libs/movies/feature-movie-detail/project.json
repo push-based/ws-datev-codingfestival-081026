@@ -1,0 +1,8 @@
+{
+  "name": "movies-feature-movie-detail",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/movies/feature-movie-detail/src",
+  "prefix": "",
+  "projectType": "library",
+  "tags": ["scope:movies", "type:feature"]
+}

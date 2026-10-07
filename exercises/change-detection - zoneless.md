@@ -7,10 +7,10 @@ In this exercise you'll get to know how to finally be able to officially remove 
 As a first step, let's use the ready2use defaults, by adding `provideExperimentalZonelessChangeDetection` to the providers
 array in your `appConfig`.
 
-For this, open the `app.config.ts` file located in the apps root folder.
+For this, open `apps/movies/src/app/app.config.ts`.
 
 ```ts
-// app.config.ts
+// apps/movies/src/app/app.config.ts
 import { ApplicationConfig, provideExperimentalZonelessChangeDetection /* 👈️ add this */ } from '@angular/core';
 
 
@@ -32,10 +32,10 @@ export const appConfig: ApplicationConfig = {
 As a next step we need to remove the `zone.js` polyfills, otherwise all browser APIs are still being 
 monkeypatched.
 
-Remove the polyfills section in the angular.json file:
+Remove the polyfills section from the `build` target in `apps/movies/project.json`:
 
 ```diff
-// angular.json
+// apps/movies/project.json
 
 -"polyfills": [
 -  "zone.js"

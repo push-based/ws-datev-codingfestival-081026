@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # affected compares against the base commit, so history is needed
+          fetch-depth: 0
+          filter: tree:0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      # base = PR target / last successful run on main, head = this commit
+      - uses: nrwl/nx-set-shas@v5
+
+      - run: npx nx format:check
+      # ubuntu-latest has 4 vCPUs (Nx default is 3)
+      - run: npx nx affected -t lint test build --parallel=4

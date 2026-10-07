@@ -14,9 +14,9 @@ Migrate `MyMovieListComponent` (and its custom `MovieSearchControlComponent`) to
 - Persisting favorites → an `effect()` instead of a `valueChanges` subscription.
 
 > The relevant files are:
-> - `src/app/movie/my-movie-list/my-movie-list.component.ts`
-> - `src/app/movie/my-movie-list/my-movie-list.component.html`
-> - `src/app/movie/movie-search-control/movie-search-control.component.ts`
+> - `libs/movies/feature-my-movies/src/lib/my-movie-list/my-movie-list.component.ts`
+> - `libs/movies/feature-my-movies/src/lib/my-movie-list/my-movie-list.component.html`
+> - `libs/movies/ui-movie-list/src/lib/movie-search-control/movie-search-control.component.ts`
 
 ## Where we start
 
@@ -53,7 +53,7 @@ Replace the `myMovieForm` `FormGroup` with an `addModel` signal and an `addForm`
   <summary>addModel + addForm</summary>
 
 ```ts
-// src/app/movie/my-movie-list/my-movie-list.component.ts
+// libs/movies/feature-my-movies/src/lib/my-movie-list/my-movie-list.component.ts
 import { signal } from '@angular/core';
 import {
   form,
@@ -102,7 +102,7 @@ Notes:
   <summary>MovieSearchControlComponent → FormValueControl</summary>
 
 ```diff
-// src/app/movie/movie-search-control/movie-search-control.component.ts
+// libs/movies/ui-movie-list/src/lib/movie-search-control/movie-search-control.component.ts
 
 -import { AfterViewInit, Component, ElementRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 -import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -214,7 +214,7 @@ A `FormArray` of `FormGroup`s becomes a `signal` holding an array, validated wit
   <summary>favorites + favoritesForm</summary>
 
 ```ts
-// src/app/movie/my-movie-list/my-movie-list.component.ts
+// libs/movies/feature-my-movies/src/lib/my-movie-list/my-movie-list.component.ts
 import { applyEach } from '@angular/forms/signals';
 
 type FavoriteMovie = TMDBMovieModel & { comment: string };
@@ -269,7 +269,7 @@ The "what happens on submit" logic belongs to the form itself. Pass a **third ar
   <summary>addForm submission option</summary>
 
 ```ts
-// src/app/movie/my-movie-list/my-movie-list.component.ts
+// libs/movies/feature-my-movies/src/lib/my-movie-list/my-movie-list.component.ts
 
 addForm = form(
   this.addModel,
@@ -303,7 +303,7 @@ addForm = form(
   <summary>component methods</summary>
 
 ```ts
-// src/app/movie/my-movie-list/my-movie-list.component.ts
+// libs/movies/feature-my-movies/src/lib/my-movie-list/my-movie-list.component.ts
 
 reset(): void {
   // reset() clears touched/dirty AND sets the value back
@@ -392,7 +392,7 @@ You migrated a Reactive Form — including a custom control and a `FormArray` �
 
 For convenience, here is the complete, finished implementation.
 
-### `src/app/movie/my-movie-list/my-movie-list.component.ts`
+### `libs/movies/feature-my-movies/src/lib/my-movie-list/my-movie-list.component.ts`
 
 ```ts
 import {
@@ -501,7 +501,7 @@ export class MyMovieListComponent {
 }
 ```
 
-### `src/app/movie/my-movie-list/my-movie-list.component.html`
+### `libs/movies/feature-my-movies/src/lib/my-movie-list/my-movie-list.component.html`
 
 ```html
 <form [formRoot]="addForm">
@@ -553,7 +553,7 @@ export class MyMovieListComponent {
 </div>
 ```
 
-### `src/app/movie/movie-search-control/movie-search-control.component.ts`
+### `libs/movies/ui-movie-list/src/lib/movie-search-control/movie-search-control.component.ts`
 
 ```ts
 import { AsyncPipe } from '@angular/common';

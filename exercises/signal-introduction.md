@@ -15,7 +15,7 @@ Go to `AppShellComponent` and replace the `sideDrawerOpen` variable with a signa
   <summary>AppShellComponent</summary>
 
 ```ts
-// src/app/app-shell/app-shell.component.ts
+// libs/movies/feature-app-shell/src/lib/app-shell/app-shell.component.ts
 
 import { signal } from '@angular/core';
 
@@ -37,7 +37,7 @@ Also apply changes to the template
   <summary>AppShellComponent Template</summary>
 
 ```html
-<!-- src/app/app-shell/app-shell.component.html -->
+<!-- libs/movies/feature-app-shell/src/lib/app-shell/app-shell.component.html -->
 
 <!-- signal usage, retrieve the value and use the set method -->
 <ui-side-drawer
@@ -59,7 +59,7 @@ Also rename the variable `_searchValue` to `searchValue` and the setter to `setS
   <summary>AppShellComponent</summary>
 
 ```ts
-// src/app/app-shell/app-shell.component.ts
+// libs/movies/feature-app-shell/src/lib/app-shell/app-shell.component.ts
 
 import { signal } from '@angular/core';
 
@@ -84,7 +84,7 @@ Also apply changes to the template. Adopt `ui-search-bar` to use signals. Keep i
   <summary>AppShellComponent Template</summary>
 
 ```html
-<!-- src/app/app-shell/app-shell.component.html -->
+<!-- libs/movies/feature-app-shell/src/lib/app-shell/app-shell.component.html -->
 
 <!-- signal usage in ui-search-bar-->
 <ui-search-bar

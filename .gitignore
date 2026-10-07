@@ -42,3 +42,11 @@ testem.log
 Thumbs.db
 
 .angular
+
+
+
+.nx/cache
+.nx/workspace-data
+.nx/migrate-runs
+vitest.config.*.timestamp*
+.vitest

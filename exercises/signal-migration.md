@@ -11,19 +11,19 @@ In order to benefit from the new signals, we can easily migrate some parts of th
 Migrate all the decorator-based Inputs to input signals.
 
 ```bash
-npx ng g @angular/core:signal-input-migration
+npx nx g @angular/core:signal-input-migration
 ```
 
 ## Migrate Outputs
 
 ```bash
-npx ng g @angular/core:output-migration
+npx nx g @angular/core:output-migration
 ```
 
 ## Migrate View Queries & Content Queries
 
 ```bash
-npx ng g @angular/core:signal-queries-migration
+npx nx g @angular/core:signal-queries-migration
 ```
 
 ## That's it! 🎉
