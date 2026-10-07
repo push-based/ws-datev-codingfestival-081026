@@ -32,7 +32,6 @@ An [Nx](https://nx.dev) workspace: the app lives in `apps/movies`, the code is s
 
 ```bash
 npx nx graph                       # project graph
-npx nx run-many -t lint test build # run tasks for all projects
 ```
 
 ## Workshop Information
@@ -46,11 +45,10 @@ npx nx run-many -t lint test build # run tasks for all projects
 
 ### Block 1: Current State & Tooling
 
+- [Nx: Task Pipelines](./exercises/nx-task-pipelines.md)
+- [Nx: Affected & Caching](./exercises/nx-affected-and-caching.md)
+- [Nx: Enforce Module Boundaries](./exercises/nx-enforce-module-boundaries.md)
 - [Angular CLI & esbuild: Bundle Analysis](./exercises/bundle-analysis-coverage_bundle-analyzer.md)
-- 🚧 Nx: Task Pipelines
-- 🚧 Nx: Affected & Caching
-- 🚧 Nx: Scalable Workspace Architectures
-- 🚧 Nx: Enforce Module Boundaries
 
 ### Block 2: Signals & Signal Change Detection
 

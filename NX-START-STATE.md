@@ -4,7 +4,7 @@ Goal: turn this Angular CLI app into the **Nx workspace the whole workshop start
 tagged, non-buildable libraries. Attendees never run `nx init` and never move files. Everybody starts from
 the same commit on `main`, and every exercise in blocks 1–4 points to the paths defined here.
 
-Context: [PLAN.md](PLAN.md), block 1 (1.3–1.11) and decisions 2, 3, 9, 10.
+Context: [PLAN.md](PLAN.md), block 1 (1.3–1.10) and decisions 2, 3, 9, 10.
 
 ---
 
@@ -19,7 +19,7 @@ Context: [PLAN.md](PLAN.md), block 1 (1.3–1.11) and decisions 2, 3, 9, 10.
     tilt directive, `movie-image.pipe`, backdrop / side-drawer, `@nx/angular:library --directory=libs/shared`).
     Confirms it is the same app as this repo.
 - **summer2025 repo** — `push-based/ws-nx-summer2025`: start state for its exercise 06 = libraries tagged except
-  two, rule set to `*` → `*`. We copy that pattern for exercise 1.11.
+  two, rule set to `*` → `*`. We copy that pattern for exercise 1.10.
 
 ---
 
@@ -66,8 +66,7 @@ The build uses the Nx executor (`@nx/angular:application`) — the Nx default.
 | `libs/shared/data-access-auth` | `scope:shared`, `type:data-access` | `core/auth.service.ts`, `core/auth.guard.ts` | — (not on the cards; decide placement) |
 
 Check the actual imports while moving — the table is based on the relative imports in `src/app` (2026-10-07).
-`movie-search-control` → `MovieService` is the one real `ui → data-access` edge; keep it, it is the finding of exercise 1.11.
-`movies/feature-favorites` must **not** exist — attendees generate it in exercise 1.9.
+`movie-search-control` → `MovieService` is the one real `ui → data-access` edge; keep it, it is the finding of exercise 1.10.
 
 Also part of the start state (PLAN decision 9): a `DirtyCheck` component (counts `ngDoCheck` into a signal,
 renders the count) in `libs/shared/utils` — **not** placed in any template yet.
@@ -129,7 +128,7 @@ renders the count) in `libs/shared/utils` — **not** placed in any template yet
 - [x] adding the scope / type constraints (template: dfl `solutions/libs-arch-enforced` `.eslintrc.json` — it
       uses `type:utils`, we use `type:util`; add `type:app` → `*`) produces exactly: errors for the 2 untagged
       libraries, and after tagging them, the `movies/ui-movie-list` → `movies/data-access` violation. Keep this solution
-      config for exercise 1.11.
+      config for exercise 1.10.
 - [x] build output: pages still in lazy chunks; initial chunk size comparable to the baseline from step 1
 - [x] compat layer intact: `grep -rn "provideZoneChangeDetection\|ChangeDetectionStrategy.Eager" apps libs`
 - [x] `DirtyCheck` component exists and is exported, not used yet
@@ -150,10 +149,12 @@ Deviations from the steps above, and decisions taken:
 - **Inferred targets:** `lint` (`@nx/eslint/plugin`) and `test` (`@nx/vitest`, `testMode: run`) for every project.
   Libraries have no `build` target (non-buildable).
 - **Tests:** Vitest via Analog (`vitest-analog`; Nx' `vitest-angular` requires buildable libraries). Nx pins Analog 2.6,
-  which crashes with TypeScript 6 (`cache.has is not a function`) → Analog 2.8. Specs: star-rating, movie-image pipe,
-  `DirtyCheckComponent`; every other library runs with `passWithNoTests`.
+  which crashes with TypeScript 6 (`cache.has is not a function`) → Analog 2.8. Every project has
+  specs: real ones for star-rating, movie-image pipe, `DirtyCheckComponent`, `MovieService`, `AuthService`, `injectEnv`,
+  a type check for the models, "creates" stubs for the components. The app has its own Vitest setup
+  (`apps/movies/vite.config.mts`) so `nx test movies` is inferred — exercise 1.5 builds on it.
 - **Lint:** flat config; rules that flag the intentionally old code (`prefer-inject`, `prefer-on-push-…`, …) are off.
-  `ui-` selector prefix enforced only in `shared-ui-design-system` (as the old `ui/.eslintrc.json` did).
+  No selector prefix rules (the old `ui-` rule of `shared-ui-design-system` was dropped).
 - **SCSS:** tokens stay in `libs/shared/ui-design-system/src/lib/token`; the app resolves them via
   `stylePreprocessorOptions.includePaths` → `@use 'token/mixins/flex'`.
 - **util-env:** `Environment`, `ENV_TOKEN`, `provideEnvironment()`, `injectEnv()`; `MovieService` uses `injectEnv()`,
@@ -164,7 +165,7 @@ Deviations from the steps above, and decisions taken:
   (160 kB). Lazy chunks are now named `index` (one per feature library barrel).
 - **`deploy`:** image `ghcr.io/push-based/angular-movies-app:dev`, no `dependsOn`, not cached.
 
-### Exercise 1.11 — verified solution config
+### Exercise 1.10 — verified solution config
 
 Replace the `*` constraint in `eslint.config.mjs`:
 
