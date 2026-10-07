@@ -45,7 +45,10 @@
         "assets": ["apps/movies/src/favicon.ico", "apps/movies/src/assets"],
         "styles": ["apps/movies/src/styles.scss"],
         "scripts": [],
-        "browser": "apps/movies/src/main.ts"
+        "browser": "apps/movies/src/main.ts",
+        "stylePreprocessorOptions": {
+          "includePaths": ["libs/shared/ui-design-system/src/lib"]
+        }
       },
       "configurations": {
         "production": {

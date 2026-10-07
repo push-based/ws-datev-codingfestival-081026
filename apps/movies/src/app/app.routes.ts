@@ -9,7 +9,7 @@ export const appRoutes: Routes = [
   {
     path: '**',
     loadComponent: () =>
-      import('./not-found-page/not-found-page.component').then(
+      import('@movies/shared/feature-not-found').then(
         (m) => m.NotFoundPageComponent,
       ),
   },

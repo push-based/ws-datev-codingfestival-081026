@@ -1,0 +1,8 @@
+{
+  "name": "movies-util-movie-image",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/movies/util-movie-image/src",
+  "prefix": "",
+  "projectType": "library",
+  "tags": []
+}

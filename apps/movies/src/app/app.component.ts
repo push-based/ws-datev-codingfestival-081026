@@ -1,7 +1,6 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-
-import { AppShellComponent } from './app-shell/app-shell.component';
+import { AppShellComponent } from '@movies/movies/feature-app-shell';
 
 @Component({
   selector: 'app-root',

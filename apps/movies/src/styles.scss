@@ -5,16 +5,16 @@
  * This reduces bundle-size of your styles.
  */
 @use 'styles/normalize';
-@use 'app/ui/token/mixins/media';
-@use 'app/ui/token/variables/borderRadius';
-@use 'app/ui/token/variables/aspectRatio';
-@use 'app/ui/token/variables/zIndex';
-@use 'app/ui/token/variables/animations';
-@use 'app/ui/token/variables/shadow';
-@use 'app/ui/token/dark-light-mode';
-@use 'app/ui/token/typography';
-@use 'app/ui/component/loader/loader';
-@use 'app/ui/component/button/button';
+@use 'token/mixins/media';
+@use 'token/variables/borderRadius';
+@use 'token/variables/aspectRatio';
+@use 'token/variables/zIndex';
+@use 'token/variables/animations';
+@use 'token/variables/shadow';
+@use 'token/dark-light-mode';
+@use 'token/typography';
+@use 'component/loader/loader';
+@use 'component/button/button';
 
 .launcher {
   display: flex;
