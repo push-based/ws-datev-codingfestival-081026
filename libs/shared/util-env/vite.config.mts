@@ -1,17 +1,16 @@
 /// <reference types='vitest' />
-import { defineConfig } from 'vite';
 import angular from '@analogjs/vite-plugin-angular';
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
-import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
+import { resolve } from 'node:path';
+import { defineConfig } from 'vite';
 
 export default defineConfig(() => ({
   root: import.meta.dirname,
   cacheDir: '../../../node_modules/.vite/libs/shared/util-env',
-  plugins: [angular(), nxViteTsPaths(), nxCopyAssetsPlugin(['*.md'])],
-  // Uncomment this if you are using workers.
-  // worker: {
-  //   plugins: () => [ nxViteTsPaths() ],
-  // },
+  // explicit tsconfig: Nx loads this config outside test mode too (project graph in CI)
+  plugins: [
+    angular({ tsconfig: resolve(import.meta.dirname, 'tsconfig.spec.json') }),
+  ],
+  resolve: { tsconfigPaths: true },
   test: {
     name: 'shared-util-env',
     watch: false,
