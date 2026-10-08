@@ -4,5 +4,5 @@
   "sourceRoot": "libs/movies/util-movie-image/src",
   "prefix": "",
   "projectType": "library",
-  "tags": []
+  "tags": ["scope:movies", "type:util"]
 }

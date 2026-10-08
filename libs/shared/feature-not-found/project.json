@@ -4,5 +4,5 @@
   "sourceRoot": "libs/shared/feature-not-found/src",
   "prefix": "",
   "projectType": "library",
-  "tags": []
+  "tags": ["scope:shared", "type:feature"]
 }
