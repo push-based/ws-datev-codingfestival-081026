@@ -7,6 +7,7 @@ when doing the actual coding exercises.
 
 * `node ^22.22.3 || ^24.15.0 || >=26`
 * `npm >= 10`
+* `git`
 
 e.g.
 ```bash
@@ -49,3 +50,29 @@ The application will be served at `localhost:4200` as default and redirects to `
 ```bash
 npx nx serve movies --open
 ```
+
+Check that movie posters show up on `/list/popular` — that means the TMDB API (`api.themoviedb.org`) and its images
+(`image.tmdb.org`) are reachable from your network.
+
+## 4. Check the Nx workspace
+
+```bash
+npx nx graph
+```
+
+The project graph opens in your browser: the `movies` app and its libraries under `libs/movies` and `libs/shared`.
+
+## 5. Prepare your AI agent (block 4)
+
+Block 4 uses an AI agent with MCP support (Copilot in VS Code, Claude Code, Cursor, Gemini CLI, Codex, …) and the
+Chrome DevTools MCP server. Make sure your agent runs, and that the MCP server can be downloaded:
+
+```bash
+npx -y chrome-devtools-mcp@latest --version
+```
+
+It prints a version number (e.g. `1.10.1`). If it fails, the npm registry is blocked — tell the trainer.
+
+> [!NOTE]
+> Optional: `docker info` — Docker is only needed for the bonus of the Nx task pipelines exercise.
+

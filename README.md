@@ -8,7 +8,19 @@ DATEV Coding Festival — 08.10.2026
 
 - `node ^22.22.3 || ^24.15.0 || >=26`
 - `npm >= 10`
+- Git
 - Chrome (latest stable)
+- an IDE — VS Code or a JetBrains IDE, ideally with the **Nx Console** extension
+- an **AI agent with MCP support** for block 4 (Copilot in VS Code, Claude Code, Cursor, Gemini CLI, Codex, …)
+- optional: Docker (bonus of the Nx task pipelines exercise)
+
+**Network access** (check proxy / firewall settings beforehand)
+
+- npm registry (`registry.npmjs.org`) — `npm install`, `npx chrome-devtools-mcp`, `npx skills`
+- `github.com` — clone, AI skills
+- `api.themoviedb.org`, `image.tmdb.org` — movie data and images
+- `fonts.googleapis.com`, `fonts.gstatic.com` — fonts
+- `stackblitz.com` — optional event loop exercise
 
 **Clone and install**
 
@@ -18,6 +30,10 @@ git clone https://github.com/push-based/ws-datev-codingfestival-081026.git
 cd ws-datev-codingfestival-081026
 npm install
 ```
+
+> [!NOTE]
+> Newer npm versions print warnings about install scripts not covered by `allowScripts` (`nx`, `esbuild`, …).
+> They can be ignored — the workspace works without them.
 
 **Run the application**
 
