@@ -75,7 +75,8 @@
       }
     },
     "deploy": {
-      "command": "docker build -f tools/deploy/frontend.Dockerfile --build-arg=APP_NAME=movies . -t ghcr.io/push-based/angular-movies-app:dev"
+      "command": "docker build -f tools/deploy/frontend.Dockerfile --build-arg=APP_NAME=movies . -t ghcr.io/push-based/angular-movies-app:dev",
+      "dependsOn": ["build"]
     }
   },
   "tags": ["scope:movies", "type:app"]
