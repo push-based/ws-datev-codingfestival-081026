@@ -1,6 +1,13 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { form, FormField } from '@angular/forms/signals';
 import { MovieSearchControlComponent } from '@movies/movies/ui-movie-list';
+import { TMDBMovieModel } from '@movies/shared/models';
 import { FastSvgComponent } from '@push-based/ngx-fast-svg';
+
+interface AddMovieModel {
+  movie: TMDBMovieModel | null;
+  comment: string;
+}
 
 /**
  * My Movies, built with Signal Forms during the exercises (`exercises/signal-forms-*.md`).
@@ -11,7 +18,23 @@ import { FastSvgComponent } from '@push-based/ngx-fast-svg';
   selector: 'my-movie-list-v2',
   templateUrl: './my-movie-list-v2.component.html',
   styleUrls: ['./my-movie-list-v2.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MovieSearchControlComponent, FastSvgComponent],
+  imports: [MovieSearchControlComponent, FastSvgComponent, FormField],
 })
-export class MyMovieListV2Component {}
+export class MyMovieListV2Component {
+  protected readonly addModel = signal<AddMovieModel>({
+    movie: null,
+    comment: '',
+  });
+
+  protected readonly addForm = form(this.addModel);
+
+  add(event: Event): void {
+    event.preventDefault();
+    console.log('submitted', this.addModel());
+    this.reset();
+  }
+
+  reset(): void {
+    this.addModel.set({ movie: null, comment: '' });
+  }
+}
