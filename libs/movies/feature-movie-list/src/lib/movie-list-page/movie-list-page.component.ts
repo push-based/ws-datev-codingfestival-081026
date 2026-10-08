@@ -3,12 +3,16 @@ import { ActivatedRoute } from '@angular/router';
 import { MovieService } from '@movies/movies/data-access';
 import { MovieListComponent } from '@movies/movies/ui-movie-list';
 import { TMDBMovieModel } from '@movies/shared/models';
-import { ElementVisibilityDirective } from '@movies/shared/utils';
+import {
+  DirtyCheckComponent,
+  ElementVisibilityDirective,
+} from '@movies/shared/utils';
 import { exhaustMap, Observable, scan, startWith, Subject, take } from 'rxjs';
 
 @Component({
   selector: 'movie-list-page',
   template: `
+    <dirty-check />
     <movie-list
       [movies]="movies"
       [favoriteMovieIds]="favoriteMovieIds"
@@ -17,7 +21,11 @@ import { exhaustMap, Observable, scan, startWith, Subject, take } from 'rxjs';
     <div (elementVisible)="paginate$.next()"></div>
   `,
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MovieListComponent, ElementVisibilityDirective],
+  imports: [
+    MovieListComponent,
+    ElementVisibilityDirective,
+    DirtyCheckComponent,
+  ],
 })
 export class MovieListPageComponent {
   paginate$ = new Subject<void>();
