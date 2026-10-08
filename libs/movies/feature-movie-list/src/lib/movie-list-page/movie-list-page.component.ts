@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MovieService } from '@movies/movies/data-access';
 import { MovieListComponent } from '@movies/movies/ui-movie-list';
@@ -14,7 +14,7 @@ import { exhaustMap, Observable, scan, startWith, Subject, take } from 'rxjs';
   template: `
     <dirty-check />
     <movie-list
-      [movies]="movies"
+      [movies]="movies()"
       [favoriteMovieIds]="favoriteMovieIds"
       (favoriteToggled)="handleFavoriteToggled($event)"
     />
@@ -30,7 +30,7 @@ import { exhaustMap, Observable, scan, startWith, Subject, take } from 'rxjs';
 export class MovieListPageComponent {
   paginate$ = new Subject<void>();
 
-  movies: TMDBMovieModel[] = [];
+  movies = signal<TMDBMovieModel[]>([]);
 
   favoriteMovieIds = new Set<string>();
 
@@ -43,13 +43,13 @@ export class MovieListPageComponent {
         this.paginate((page) =>
           this.movieService.getMovieList(params.category, page),
         ).subscribe((movies) => {
-          this.movies = movies;
+          this.movies.set(movies);
         });
       } else {
         this.paginate((page) =>
           this.movieService.getMoviesByGenre(params.id, page),
         ).subscribe((movies) => {
-          this.movies = movies;
+          this.movies.set(movies);
         });
       }
     });

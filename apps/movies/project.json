@@ -39,7 +39,7 @@
           "base": "dist/apps/movies"
         },
         "index": "apps/movies/src/index.html",
-        "polyfills": ["zone.js"],
+        "polyfills": [],
         "tsConfig": "apps/movies/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": ["apps/movies/src/favicon.ico", "apps/movies/src/assets"],

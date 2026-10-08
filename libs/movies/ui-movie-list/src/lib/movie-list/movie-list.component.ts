@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-} from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TMDBMovieModel } from '@movies/shared/models';
 import { FastSvgComponent } from '@push-based/ngx-fast-svg';
@@ -42,7 +36,6 @@ import { MovieCardComponent } from '../movie-card/movie-card.component';
       position: relative;
     }
   `,
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MovieCardComponent, RouterLink, FastSvgComponent],
 })
 export class MovieListComponent {
