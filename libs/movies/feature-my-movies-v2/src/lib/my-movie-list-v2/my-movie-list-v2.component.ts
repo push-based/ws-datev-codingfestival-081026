@@ -1,5 +1,12 @@
-import { Component, signal } from '@angular/core';
-import { form, FormField, minLength, required } from '@angular/forms/signals';
+import { Component, inject, signal } from '@angular/core';
+import {
+  form,
+  FormField,
+  FormRoot,
+  minLength,
+  required,
+} from '@angular/forms/signals';
+import { MovieService } from '@movies/movies/data-access';
 import { MovieSearchControlComponent } from '@movies/movies/ui-movie-list';
 import { TMDBMovieModel } from '@movies/shared/models';
 import { FastSvgComponent } from '@push-based/ngx-fast-svg';
@@ -18,7 +25,7 @@ interface AddMovieModel {
   selector: 'my-movie-list-v2',
   templateUrl: './my-movie-list-v2.component.html',
   styleUrls: ['./my-movie-list-v2.component.scss'],
-  imports: [MovieSearchControlComponent, FastSvgComponent, FormField],
+  imports: [MovieSearchControlComponent, FastSvgComponent, FormField, FormRoot],
 })
 export class MyMovieListV2Component {
   protected readonly addModel = signal<AddMovieModel>({
@@ -26,22 +33,45 @@ export class MyMovieListV2Component {
     comment: '',
   });
 
-  protected readonly addForm = form(this.addModel, (path) => {
-    required(path.movie, { message: 'Entering a title is required' });
-    required(path.comment, { message: 'Entering a comment is required' });
-    minLength(path.comment, 5, {
-      message: ({ value }) =>
-        `Please enter at least 5 characters, right now you've entered ${value().length}`,
-    });
-  });
+  private movieService = inject(MovieService);
 
-  add(event: Event): void {
-    event.preventDefault();
-    if (this.addForm().valid()) {
-      console.log('submitted', this.addModel());
-      this.reset();
-    }
-  }
+  protected readonly addForm = form(
+    this.addModel,
+    (path) => {
+      required(path.movie, { message: 'Entering a title is required' });
+      required(path.comment, { message: 'Entering a comment is required' });
+      minLength(path.comment, 5, {
+        message: ({ value }) =>
+          `Please enter at least 5 characters, right now you've entered ${value().length}`,
+      });
+    },
+    {
+      submission: {
+        action: async (addForm) => {
+          const { movie, comment } = addForm().value();
+          const favorite = { ...(movie as TMDBMovieModel), comment };
+
+          try {
+            await this.movieService.addFavorite(favorite);
+          } catch (error) {
+            addForm.comment().fieldTree().focusBoundControl();
+            return {
+              kind: 'server',
+              message: (error as Error).message,
+              fieldTree: addForm.comment,
+            };
+          }
+
+          this.reset();
+          return undefined;
+        },
+        onInvalid: (addForm) => {
+          addForm().errorSummary()[0]?.fieldTree().focusBoundControl();
+        },
+        ignoreValidators: 'none',
+      },
+    },
+  );
 
   reset(): void {
     this.addForm().reset({ movie: null, comment: '' });
