@@ -7,6 +7,5 @@
 
 .angular
 
-# trainer notes, deleted before the workshop
+# trainer notes (local only, gitignored)
 /PLAN.md
-/NX-START-STATE.md

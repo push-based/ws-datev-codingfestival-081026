@@ -36,8 +36,8 @@ npx nx graph                       # project graph
 
 ## Workshop Information
 
-- ws info doc: TBD
-- slides: TBD
+- ws info doc: [Google Doc](https://docs.google.com/document/d/1Jqo-gJGealYcbI4y4qQ8l4gjmJK1HRRsi7B3dm1e8S8/edit?usp=sharing)
+- slides: [Google Drive folder](https://drive.google.com/drive/folders/1gAM5agZPfBOdL7wn0Sn-7GAbER4N6QHA?usp=sharing)
 
 ## Exercises
 
