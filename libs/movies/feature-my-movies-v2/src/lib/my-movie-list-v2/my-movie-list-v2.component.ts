@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { form, FormField } from '@angular/forms/signals';
+import { form, FormField, minLength, required } from '@angular/forms/signals';
 import { MovieSearchControlComponent } from '@movies/movies/ui-movie-list';
 import { TMDBMovieModel } from '@movies/shared/models';
 import { FastSvgComponent } from '@push-based/ngx-fast-svg';
@@ -26,15 +26,24 @@ export class MyMovieListV2Component {
     comment: '',
   });
 
-  protected readonly addForm = form(this.addModel);
+  protected readonly addForm = form(this.addModel, (path) => {
+    required(path.movie, { message: 'Entering a title is required' });
+    required(path.comment, { message: 'Entering a comment is required' });
+    minLength(path.comment, 5, {
+      message: ({ value }) =>
+        `Please enter at least 5 characters, right now you've entered ${value().length}`,
+    });
+  });
 
   add(event: Event): void {
     event.preventDefault();
-    console.log('submitted', this.addModel());
-    this.reset();
+    if (this.addForm().valid()) {
+      console.log('submitted', this.addModel());
+      this.reset();
+    }
   }
 
   reset(): void {
-    this.addModel.set({ movie: null, comment: '' });
+    this.addForm().reset({ movie: null, comment: '' });
   }
 }
