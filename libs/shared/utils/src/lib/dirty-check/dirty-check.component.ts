@@ -1,4 +1,9 @@
-import { Component, DoCheck, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DoCheck,
+  signal,
+} from '@angular/core';
 
 /** Counts how often its host view is checked. Use `<dirty-check />` in a template. */
 @Component({
@@ -15,6 +20,7 @@ import { Component, DoCheck, signal } from '@angular/core';
       }
     `,
   ],
+  changeDetection: ChangeDetectionStrategy.Eager,
 })
 export class DirtyCheckComponent implements DoCheck {
   checked = signal(0);
