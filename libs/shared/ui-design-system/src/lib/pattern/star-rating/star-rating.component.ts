@@ -1,4 +1,3 @@
-import { NgClass } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -19,10 +18,8 @@ const numStars = 5;
       @for (fill of stars(); track fill) {
         <span
           class="star"
-          [ngClass]="{
-            'star-half': fill === 0,
-            'star-empty': fill === -1,
-          }"
+          [class.star-empty]="fill === 1"
+          [class.star-half]="fill === 0"
         >
           ★
         </span>
@@ -37,7 +34,6 @@ const numStars = 5;
     '../../component/tooltip/_tooltip.scss',
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgClass],
 })
 export class StarRatingComponent {
   showRating = input(false);
