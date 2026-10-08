@@ -31,10 +31,6 @@ cd ws-datev-codingfestival-081026
 npm install
 ```
 
-> [!NOTE]
-> Newer npm versions print warnings about install scripts not covered by `allowScripts` (`nx`, `esbuild`, …).
-> They can be ignored — the workspace works without them.
-
 **Run the application**
 
 ```bash
@@ -42,9 +38,6 @@ npx nx serve movies
 ```
 
 **Workspace**
-
-An [Nx](https://nx.dev) workspace: the app lives in `apps/movies`, the code is split into libraries under
-`libs/<scope>/<name>` (scopes `movies` and `shared`), imported via `@movies/<scope>/<name>`.
 
 ```bash
 npx nx graph                       # project graph
@@ -89,9 +82,6 @@ Bonus
 - [Change Detection: OnPush](./exercises/change-detection%20-%20OnPush.md)
 
 ### Block 3: Signal Forms
-
-We build **My Movies (Signal Forms)** (`/my-movies-v2`, in the side menu) from an empty shell in its own feature
-library, `libs/movies/feature-my-movies-v2`. The Reactive Forms version (`/my-movies`) stays as it is, for comparison.
 
 - [Signal Forms 1: A first signal form](./exercises/signal-forms-01-first-form.md)
 - [Signal Forms 2: Simple validation](./exercises/signal-forms-02-validation.md)
