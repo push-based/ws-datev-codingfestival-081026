@@ -5,6 +5,8 @@ import {
   withXhr,
 } from '@angular/common/http';
 import { ApplicationConfig } from '@angular/core';
+import { provideSignalFormsConfig } from '@angular/forms/signals';
+import { NG_STATUS_CLASSES } from '@angular/forms/signals/compat';
 import { provideRouter } from '@angular/router';
 import { provideEnvironment } from '@movies/shared/util-env';
 import { provideFastSVG } from '@push-based/ngx-fast-svg';
@@ -17,6 +19,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideEnvironment(environment),
     provideRouter(appRoutes),
+    provideSignalFormsConfig({ classes: NG_STATUS_CLASSES }),
     provideHttpClient(withXhr(), withInterceptorsFromDi()),
     provideFastSVG({
       url: (name: string) => `assets/svg-icons/${name}.svg`,

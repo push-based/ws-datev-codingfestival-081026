@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { MovieService } from '@movies/movies/data-access';
@@ -41,19 +41,17 @@ export class AppShellComponent {
 
   genres$ = this.movieService.getGenres();
 
-  sideDrawerOpen = false;
+  sideDrawerOpen = signal(false);
 
-  private _searchValue = '';
-  set searchValue(value: string) {
-    this._searchValue = value;
+  searchValue = signal('');
+
+  setSearchValue(value: string) {
+    this.searchValue.set(value);
     this.router.navigate(['search', value]);
-  }
-  get searchValue(): string {
-    return this._searchValue;
   }
 
   toggleSideDrawer() {
-    this.sideDrawerOpen = !this.sideDrawerOpen;
+    this.sideDrawerOpen.update((open) => !open);
   }
 
   trackNavigation(route: string) {

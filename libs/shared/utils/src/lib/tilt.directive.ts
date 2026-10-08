@@ -1,16 +1,16 @@
-import { Directive, ElementRef, Input } from '@angular/core';
+import { Directive, ElementRef, Input, signal } from '@angular/core';
 import { fromEvent, map, merge } from 'rxjs';
 
 @Directive({
   selector: '[tilt]',
   host: {
-    '[style.transform]': 'rotate',
+    '[style.transform]': 'rotate()',
   },
 })
 export class TiltDirective {
   @Input() tiltDegree = 5;
 
-  rotate = 'rotate(0deg)';
+  rotate = signal('rotate(0deg)');
 
   constructor(private elementRef: ElementRef<HTMLElement>) {
     const rotate$ = fromEvent<MouseEvent>(
@@ -23,7 +23,7 @@ export class TiltDirective {
     );
 
     merge(rotate$, reset$).subscribe((rotate) => {
-      this.rotate = rotate;
+      this.rotate.set(rotate);
     });
   }
 

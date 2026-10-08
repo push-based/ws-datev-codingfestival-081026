@@ -1,29 +1,55 @@
-<form>
+<form [formRoot]="addForm">
   <div class="form-group">
     <label for="search">Search</label>
-    <app-movie-search-control id="search" />
+    <app-movie-search-control [formField]="addForm.movie" id="search" />
+    @if (addForm.movie().touched() && addForm.movie().invalid()) {
+      @for (error of addForm.movie().errors(); track error.kind) {
+        <span class="error">{{ error.message }}</span>
+      }
+    }
   </div>
   <div class="form-group">
     <label for="comment">Comment</label>
-    <textarea rows="5" id="comment"></textarea>
+    <textarea rows="5" id="comment" [formField]="addForm.comment"></textarea>
+    @if (addForm.comment().touched() && addForm.comment().invalid()) {
+      @for (error of addForm.comment().errors(); track error.kind) {
+        <span class="error">{{ error.message }}</span>
+      }
+    }
   </div>
   <div class="button-group">
     <button class="btn" type="button">Reset</button>
-    <button class="btn primary-button" type="submit">Save</button>
+    <button class="btn primary-button" type="submit">
+      {{ addForm().submitting() ? 'Saving...' : 'Save' }}
+    </button>
   </div>
 </form>
 
+<p class="hint">
+  movie: {{ addModel().movie?.title ?? '-' }} · comment:
+  {{ addModel().comment }}
+</p>
+
 <h2>My Movies</h2>
 <div class="my-movies-list">
-  <!-- one row per favorite: exercise 4 turns this into a @for -->
-  <div class="movie-item">
-    <span class="movie-title">Movie title</span>
-    <div class="form-group">
-      <textarea class="movie-comment"></textarea>
+  @for (favorite of favoritesForm; track favorite; let i = $index) {
+    <div class="movie-item">
+      <span class="movie-title">{{ favorite.title().value() }}</span>
+      <div class="form-group">
+        <textarea
+          class="movie-comment"
+          [formField]="favorite.comment"
+        ></textarea>
+        @if (favorite.comment().invalid()) {
+          @for (error of favorite.comment().errors(); track error.kind) {
+            <span class="error">{{ error.message }}</span>
+          }
+        }
+      </div>
+      <button class="btn btn__icon" type="button" (click)="removeMovie(i)">
+        <fast-svg name="delete"></fast-svg>
+        Delete
+      </button>
     </div>
-    <button class="btn btn__icon" type="button">
-      <fast-svg name="delete"></fast-svg>
-      Delete
-    </button>
-  </div>
+  }
 </div>

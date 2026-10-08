@@ -1,28 +1,36 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MovieService } from '@movies/movies/data-access';
 import { MovieListComponent } from '@movies/movies/ui-movie-list';
 import { TMDBMovieModel } from '@movies/shared/models';
-import { ElementVisibilityDirective } from '@movies/shared/utils';
+import {
+  DirtyCheckComponent,
+  ElementVisibilityDirective,
+} from '@movies/shared/utils';
 import { exhaustMap, Observable, scan, startWith, Subject, take } from 'rxjs';
 
 @Component({
   selector: 'movie-list-page',
   template: `
+    <dirty-check />
     <movie-list
-      [movies]="movies"
+      [movies]="movies()"
       [favoriteMovieIds]="favoriteMovieIds"
       (favoriteToggled)="handleFavoriteToggled($event)"
     />
     <div (elementVisible)="paginate$.next()"></div>
   `,
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [MovieListComponent, ElementVisibilityDirective],
+  imports: [
+    MovieListComponent,
+    ElementVisibilityDirective,
+    DirtyCheckComponent,
+  ],
 })
 export class MovieListPageComponent {
   paginate$ = new Subject<void>();
 
-  movies: TMDBMovieModel[] = [];
+  movies = signal<TMDBMovieModel[]>([]);
 
   favoriteMovieIds = new Set<string>();
 
@@ -35,13 +43,13 @@ export class MovieListPageComponent {
         this.paginate((page) =>
           this.movieService.getMovieList(params.category, page),
         ).subscribe((movies) => {
-          this.movies = movies;
+          this.movies.set(movies);
         });
       } else {
         this.paginate((page) =>
           this.movieService.getMoviesByGenre(params.id, page),
         ).subscribe((movies) => {
-          this.movies = movies;
+          this.movies.set(movies);
         });
       }
     });

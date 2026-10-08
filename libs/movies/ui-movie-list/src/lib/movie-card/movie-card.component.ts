@@ -10,13 +10,14 @@ import {
 import { MovieImagePipe } from '@movies/movies/util-movie-image';
 import { TMDBMovieModel } from '@movies/shared/models';
 import { StarRatingComponent } from '@movies/shared/ui-design-system';
-import { TiltDirective } from '@movies/shared/utils';
+import { DirtyCheckComponent, TiltDirective } from '@movies/shared/utils';
 import { fromEvent } from 'rxjs';
 
 @Component({
   selector: 'movie-card',
   template: `
     <div class="movie-card">
+      <dirty-check />
       <img
         tilt
         [tiltDegree]="5"
@@ -78,7 +79,13 @@ import { fromEvent } from 'rxjs';
     }
   `,
   changeDetection: ChangeDetectionStrategy.Eager,
-  imports: [TiltDirective, StarRatingComponent, UpperCasePipe, MovieImagePipe],
+  imports: [
+    TiltDirective,
+    StarRatingComponent,
+    UpperCasePipe,
+    MovieImagePipe,
+    DirtyCheckComponent,
+  ],
 })
 export class MovieCardComponent {
   @Input({ required: true }) movie!: TMDBMovieModel;

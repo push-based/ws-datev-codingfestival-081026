@@ -39,7 +39,7 @@
           "base": "dist/apps/movies"
         },
         "index": "apps/movies/src/index.html",
-        "polyfills": ["zone.js"],
+        "polyfills": [],
         "tsConfig": "apps/movies/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": ["apps/movies/src/favicon.ico", "apps/movies/src/assets"],
@@ -75,7 +75,8 @@
       }
     },
     "deploy": {
-      "command": "docker build -f tools/deploy/frontend.Dockerfile --build-arg=APP_NAME=movies . -t ghcr.io/push-based/angular-movies-app:dev"
+      "command": "docker build -f tools/deploy/frontend.Dockerfile --build-arg=APP_NAME=movies . -t ghcr.io/push-based/angular-movies-app:dev",
+      "dependsOn": ["build"]
     }
   },
   "tags": ["scope:movies", "type:app"]

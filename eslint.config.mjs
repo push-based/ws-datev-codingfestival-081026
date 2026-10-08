@@ -29,7 +29,39 @@ export default [
         {
           enforceBuildableLibDependency: true,
           allow: [],
-          depConstraints: [{ sourceTag: '*', onlyDependOnLibsWithTags: ['*'] }],
+          depConstraints: [
+            {
+              sourceTag: 'scope:movies',
+              onlyDependOnLibsWithTags: ['scope:movies', 'scope:shared'],
+            },
+            {
+              sourceTag: 'scope:shared',
+              onlyDependOnLibsWithTags: ['scope:shared'],
+            },
+            { sourceTag: 'type:app', onlyDependOnLibsWithTags: ['*'] },
+            {
+              sourceTag: 'type:feature',
+              onlyDependOnLibsWithTags: [
+                'type:feature',
+                'type:data-access',
+                'type:ui',
+                'type:util',
+              ],
+            },
+            {
+              sourceTag: 'type:data-access',
+              onlyDependOnLibsWithTags: ['type:data-access', 'type:util'],
+            },
+            {
+              sourceTag: 'type:ui',
+              onlyDependOnLibsWithTags: [
+                'type:data-access',
+                'type:ui',
+                'type:util',
+              ],
+            },
+            { sourceTag: 'type:util', onlyDependOnLibsWithTags: ['type:util'] },
+          ],
         },
       ],
     },
