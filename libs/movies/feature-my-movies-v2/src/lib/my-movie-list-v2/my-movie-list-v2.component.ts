@@ -1,5 +1,6 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import {
+  applyEach,
   form,
   FormField,
   FormRoot,
@@ -10,6 +11,8 @@ import { MovieService } from '@movies/movies/data-access';
 import { MovieSearchControlComponent } from '@movies/movies/ui-movie-list';
 import { TMDBMovieModel } from '@movies/shared/models';
 import { FastSvgComponent } from '@push-based/ngx-fast-svg';
+
+type FavoriteMovie = TMDBMovieModel & { comment: string };
 
 interface AddMovieModel {
   movie: TMDBMovieModel | null;
@@ -34,6 +37,24 @@ export class MyMovieListV2Component {
   });
 
   private movieService = inject(MovieService);
+
+  protected readonly favorites = signal<FavoriteMovie[]>(
+    // movies liked on the movie list are stored without a comment:
+    // normalize them, a field only exists for a property that exists
+    this.movieService
+      .getFavorites()
+      .map((favorite) => ({ ...favorite, comment: favorite.comment ?? '' })),
+  );
+
+  protected readonly favoritesForm = form(this.favorites, (favorites) => {
+    applyEach(favorites, (favorite) => {
+      required(favorite.comment, { message: 'Entering a comment is required' });
+      minLength(favorite.comment, 5, {
+        message: ({ value }) =>
+          `Please enter at least 5 characters, right now you've entered ${value().length}`,
+      });
+    });
+  });
 
   protected readonly addForm = form(
     this.addModel,
@@ -61,7 +82,7 @@ export class MyMovieListV2Component {
               fieldTree: addForm.comment,
             };
           }
-
+          this.favorites.update((favorites) => [...favorites, favorite]);
           this.reset();
           return undefined;
         },
@@ -73,7 +94,21 @@ export class MyMovieListV2Component {
     },
   );
 
+  constructor() {
+    effect(() => {
+      if (this.favoritesForm().valid()) {
+        this.movieService.setFavorites(this.favorites());
+      }
+    });
+  }
+
   reset(): void {
     this.addForm().reset({ movie: null, comment: '' });
+  }
+
+  removeMovie(index: number): void {
+    this.favorites.update((favorites) =>
+      favorites.filter((_, i) => i !== index),
+    );
   }
 }

@@ -32,15 +32,24 @@
 
 <h2>My Movies</h2>
 <div class="my-movies-list">
-  <!-- one row per favorite: exercise 4 turns this into a @for -->
-  <div class="movie-item">
-    <span class="movie-title">Movie title</span>
-    <div class="form-group">
-      <textarea class="movie-comment"></textarea>
+  @for (favorite of favoritesForm; track favorite; let i = $index) {
+    <div class="movie-item">
+      <span class="movie-title">{{ favorite.title().value() }}</span>
+      <div class="form-group">
+        <textarea
+          class="movie-comment"
+          [formField]="favorite.comment"
+        ></textarea>
+        @if (favorite.comment().invalid()) {
+          @for (error of favorite.comment().errors(); track error.kind) {
+            <span class="error">{{ error.message }}</span>
+          }
+        }
+      </div>
+      <button class="btn btn__icon" type="button" (click)="removeMovie(i)">
+        <fast-svg name="delete"></fast-svg>
+        Delete
+      </button>
     </div>
-    <button class="btn btn__icon" type="button">
-      <fast-svg name="delete"></fast-svg>
-      Delete
-    </button>
-  </div>
+  }
 </div>
