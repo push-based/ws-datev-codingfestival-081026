@@ -55,6 +55,7 @@ The build uses the Nx executor (`@nx/angular:application`) — the Nx default.
 | `libs/movies/feature-movie-detail` | `scope:movies`, `type:feature` | `movie/movie-detail-page/` | movie-detail page |
 | `libs/movies/feature-movie-search` | `scope:movies`, `type:feature` | `movie/movie-search-page/` | movie-search page |
 | `libs/movies/feature-my-movies` | `scope:movies`, `type:feature` | `movie/my-movie-list/` | my-movies |
+| `libs/movies/feature-my-movies-v2` | `scope:movies`, `type:feature` | empty shell for block 3 (added later, not from `src/app`); imports `movie-search-control` from `ui-movie-list` | — |
 | `libs/movies/data-access` | `scope:movies`, `type:data-access` | `movie/movie.service.ts`, `movie/movie.store.ts` | movie service |
 | `libs/movies/ui-movie-list` | `scope:movies`, `type:ui` | `movie/movie-list/`, `movie/movie-card/`, `movie/movie-search-control/` ← **hidden violation**: injects `MovieService` | movie-list |
 | `libs/movies/util-movie-image` | **untagged on purpose** | `movie/movie-image.pipe.ts` | movie-image pipe |

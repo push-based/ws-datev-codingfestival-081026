@@ -7,9 +7,9 @@ We will replace basic functionality and ensure the signal setup is rendering our
 
 Refactor `AppShellComponent` and introduce signals to the menu logic.
 
-## SidedrawerOpen as signal
+## `sideDrawerOpen` as signal
 
-Go to `AppShellComponent` and replace the `sideDrawerOpen` variable with a signal and update all usages.
+Go to `AppShellComponent` (`libs/movies/feature-app-shell/src/lib/app-shell/app-shell.component.ts`) and replace the `sideDrawerOpen` variable with a signal and update all usages.
 
 <details>
   <summary>AppShellComponent</summary>
@@ -17,7 +17,7 @@ Go to `AppShellComponent` and replace the `sideDrawerOpen` variable with a signa
 ```ts
 // libs/movies/feature-app-shell/src/lib/app-shell/app-shell.component.ts
 
-import { signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 
 sideDrawerOpen = signal(false);
 ```
@@ -31,7 +31,7 @@ toggleSideDrawer() {
 
 </details>
 
-Also apply changes to the template
+Also apply changes to the template.
 
 <details>
   <summary>AppShellComponent Template</summary>
@@ -48,12 +48,13 @@ Also apply changes to the template
 
 </details>
 
-Test if the side drawer opens on click as well as on resize.
+Make the browser window narrow (< 1298px, above that the drawer is always open) and test that the side drawer opens
+and closes on click.
 
-## SearchValue as signal
+## `searchValue` as signal
 
 Go to `AppShellComponent` and replace the `_searchValue` variable with a signal.
-Also rename the variable `_searchValue` to `searchValue` and the setter to `setSearchValue` and remove the getter.
+Rename the variable `_searchValue` to `searchValue`, turn the `set searchValue(...)` setter into a normal method `setSearchValue(value: string)` (no `set` keyword), and remove the getter.
 
 <details>
   <summary>AppShellComponent</summary>
@@ -61,24 +62,22 @@ Also rename the variable `_searchValue` to `searchValue` and the setter to `setS
 ```ts
 // libs/movies/feature-app-shell/src/lib/app-shell/app-shell.component.ts
 
-import { signal } from '@angular/core';
-
 searchValue = signal('');
 
 setSearchValue(value: string) {
-    this.searchValue.set(value);
-    this.router.navigate(['search', value]);
+  this.searchValue.set(value);
+  this.router.navigate(['search', value]);
 }
 
 // 👇 Remove getter
 get searchValue() {
-    //...
+  //...
 }
 ```
 
 </details>
 
-Also apply changes to the template. Adopt `ui-search-bar` to use signals. Keep in mind that we have a setter function named `setSearchValue`.
+Also apply changes to the template. Adapt `ui-search-bar` to use signals. Keep in mind that we have a method named `setSearchValue`.
 
 <details>
   <summary>AppShellComponent Template</summary>
@@ -94,5 +93,4 @@ Also apply changes to the template. Adopt `ui-search-bar` to use signals. Keep i
 ```
 
 </details>
-
-
+Test the search: it navigates to `/search/<your query>`.

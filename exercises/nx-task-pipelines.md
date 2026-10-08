@@ -33,8 +33,6 @@ Now run the tests of the app:
 npx nx test movies
 ```
 
-It works. But there is no `test` target in `project.json` — where does it come from?
-
 ## 3. Inferred tasks
 
 Open the project details of the app.
@@ -77,7 +75,6 @@ Run `lint` and `test` for all projects with one command.
 npx nx run-many -t lint test
 ```
 
-Nx runs the tasks in parallel. Limit it to some projects with `-p`:
 
 ```bash
 npx nx run-many -t lint test -p shared-ui-design-system movies-util-movie-image
@@ -112,21 +109,22 @@ Compare with the project graph: `npx nx graph`.
 > [!IMPORTANT]
 > `deploy` requires a running **Docker** (`docker info` must work).
 >
-> No Docker? Replace the `deploy` command with one that also needs the build output:
+> No Docker? Replace the `deploy` command with one that also needs the build output (works in every shell, incl.
+> Windows):
 >
 > ```json
 > "deploy": {
->   "command": "ls dist/apps/movies/browser && echo 'deployed 🚀'"
+>   "command": "cd dist/apps/movies/browser && echo deployed"
 > }
 > ```
->
+
+Delete `dist` and deploy:
 
 ```bash
-rm -rf dist
+node -e "require('fs').rmSync('dist', { recursive: true, force: true })"
 npx nx run movies:deploy
 ```
 
-It fails — there is nothing in `dist`. Make `deploy` run `build` first.
 
 <details>
   <summary>Solution</summary>
@@ -140,12 +138,16 @@ It fails — there is nothing in `dist`. Make `deploy` run `build` first.
 }
 ```
 
+Using the no-Docker fallback? Add the same `dependsOn` line, keep your `command`.
+
 `"build"` (without `^`) means: the `build` task of the **same** project.
 
 ```bash
 npx nx run movies:deploy          # runs movies:build first
 npx nx run movies:deploy --graph  # deploy → build
 ```
+
+`Successfully ran target deploy for project movies and 1 task it depends on`.
 
 Run it twice: `build` comes from the cache, `deploy` runs again — it has no `cache: true`.
 
@@ -160,8 +162,9 @@ Want more? Let `deploy` also depend on `lint` and `test`, and validate it in the
 "dependsOn": ["build", "lint", "test"]
 ```
 
-Inferred targets can be used in `dependsOn` like configured ones. Want the libraries' tests too? `"^test"` adds the
-`test` tasks of the projects `movies` imports directly.
+The task graph shows `deploy` → `build`, `lint` and `test` of `movies`. Inferred targets can be used in `dependsOn`
+like configured ones. Want the libraries' tests too? `"^test"` adds the `test` tasks of the 9 projects `movies`
+imports directly.
 Check with `npx nx run movies:deploy --graph`.
 
 </details>

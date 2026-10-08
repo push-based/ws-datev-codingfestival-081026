@@ -23,7 +23,11 @@ import { of, Subject, switchMap } from 'rxjs';
     @if (movies$ | async; as movies) {
       <div class="results">
         @for (movie of movies; track movie) {
-          <button class="movie-result" (click)="selectMovie(movie)">
+          <button
+            type="button"
+            class="movie-result"
+            (click)="selectMovie(movie)"
+          >
             <img
               [src]="movie.poster_path | movieImage"
               width="35"

@@ -15,7 +15,7 @@ depConstraints: [{ sourceTag: '*', onlyDependOnLibsWithTags: ['*'] }],
 npx nx run-many -t lint
 ```
 
-All green.
+Green (only warnings).
 
 ## 2. Scope rules
 
@@ -53,7 +53,8 @@ All of them are imports of the two libraries **without tags** — a library with
 
 ## 3. Tag the libraries
 
-Give the two libraries their tags (`project.json`). Lint is green again.
+Give the two libraries their tags in `project.json` (`libs/movies/util-movie-image`, `libs/shared/feature-not-found`).
+Lint is green again.
 
 <details>
   <summary>Solution</summary>
@@ -109,9 +110,7 @@ libs/movies/ui-movie-list/src/lib/movie-search-control/movie-search-control.comp
 `MovieSearchControlComponent` is a UI component, but it injects `MovieService` from `@movies/movies/data-access`
 to call `searchMovies()`. A UI component should get its data via inputs and report via outputs.
 
-Fixes to discuss:
-
-- pass the data in: its only user, `feature-my-movies`, runs the search and hands the results to the control
-- or the control is not UI at all: move it into `feature-my-movies`
+Fix to discuss: pass the data in — its users, `feature-my-movies` and `feature-my-movies-v2`, run the search and
+hand the results to the control.
 
 </details>

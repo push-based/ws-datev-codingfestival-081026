@@ -31,14 +31,13 @@ Remove everything `ControlValueAccessor`:
 
 * the `NG_VALUE_ACCESSOR` provider
 * `writeValue`, `registerOnChange`, `registerOnTouched`, `setDisabledState`
-* `onChange`, `onTouched` and the `movieCache`
-* `ngAfterViewInit`
+* `onChange`, `onTouched` and the `movieCache`, and the `(blur)="onTouched()"` binding in the template
+* `ngAfterViewInit` and the `@ViewChild` (step 5 brings a signal-based one back)
 
 Implement `FormValueControl<TMDBMovieModel | null>` from `@angular/forms/signals` and add the required `value`
 model. In `selectMovie()`, setting the value **is** the change notification.
 
-While you are at it, use `TMDBMovieModel` instead of `MovieModel`, `inject()` the service and give the result buttons
-`type="button"`, so a click doesn't submit the surrounding form.
+While you are at it, use `TMDBMovieModel` instead of `MovieModel` and `inject()` the service.
 
 <details>
   <summary>FormValueControl with value</summary>
@@ -63,6 +62,11 @@ export class MovieSearchControlComponent
     this.searchTerm$.next('');
   }
 }
+```
+
+```html
+<!-- the input in the inline template, without the (blur) binding -->
+<input #searchInput (input)="searchTerm$.next(searchInput.value)" />
 ```
 
 </details>
@@ -130,7 +134,7 @@ The control can ask for the field state it needs. Add three **inputs**: `touched
 
 Use them on the inner input:
 
-* `[class.invalid]` when it is touched and invalid, and a style for `input.invalid`
+* `[class.invalid]` when it is touched and invalid, and a style for `input.invalid` in the component's `styles`
 * `[disabled]` when the field is disabled
 
 <details>
@@ -156,7 +160,8 @@ readonly disabled = input(false);
 />
 ```
 
-```scss
+```css
+/* in styles, next to the other input styles */
 input.invalid {
   border-color: var(--palette-secondary-main);
 }
@@ -195,8 +200,9 @@ Serve the application and click **Save** on the empty form: the search input get
 
 ## 6. The old page still works
 
-`app-movie-search-control` lives in the shared `@movies/movies/ui-movie-list` library: the old **My Movies** page uses it too, with `formControlName` in a Reactive
-Forms `FormGroup`. Open it: search, select, save and reset still work.
+`app-movie-search-control` lives in the shared `@movies/movies/ui-movie-list` library: the old **My Movies** page
+uses it too, with `formControlName` in a Reactive Forms `FormGroup`. Open it: search, select, save and reset still
+work.
 
 Since Angular 22, a `FormValueControl` also works with Reactive Forms (`formControlName`, `[formControl]`) and with
 `ngModel`. You can convert a shared control without breaking the forms that still use it. Just never implement
@@ -244,10 +250,10 @@ import { of, Subject, switchMap } from 'rxjs';
     />
     @if (movies$ | async; as movies) {
       <div class="results">
-        @for (movie of movies; track movie.id) {
+        @for (movie of movies; track movie) {
           <button
-            class="movie-result"
             type="button"
+            class="movie-result"
             (click)="selectMovie(movie)"
           >
             <img

@@ -58,8 +58,8 @@ npx nx show projects --affected
 npx nx affected -t lint --graph
 ```
 
-7 projects: `movies-util-movie-image` and everything that imports it, directly or transitively —
-`movies-ui-movie-list`, the feature libraries using the list, and the app.
+8 projects: `movies-util-movie-image` and everything that imports it, directly or transitively —
+`movies-ui-movie-list`, the feature libraries using the list (incl. `feature-my-movies-v2`), and the app.
 
 1. Nx takes the git diff → `libs/movies/util-movie-image/...` changed
 2. the file belongs to the project `movies-util-movie-image`
@@ -70,15 +70,16 @@ npx nx affected -t lint --graph
 npx nx affected -t lint test
 ```
 
-Try a library further down the graph, e.g. `libs/shared/models` — how many projects are affected now?
+A library further down the graph, e.g. `libs/shared/models`, affects even more: 10 projects.
 
 </details>
 
 ## 3. Cache
 
-Build the app twice.
+Clear the cache (the build from the previous exercise is in it), then build the app twice.
 
 ```bash
+npx nx reset
 npx nx build movies
 npx nx build movies
 ```
@@ -89,12 +90,12 @@ npx nx build movies
 The second run takes milliseconds:
 
 ```
-NX   1 task: 1 succeeded, 1 cached
+Nx read the output from the cache instead of running the command for 1 out of 1 tasks.
   Cache:             1/1 hit (100%)
 ```
 
 Nx hashes the task's inputs (source files, config, dependencies, the command). Same hash → it replays the terminal
-output and restores the files in `dist/apps/movies` from the cache (`.nx/cache`).
+output and restores the files in `dist/apps/movies` from the cache (`~/.nx/<workspace-id>/cache`).
 
 </details>
 
@@ -108,13 +109,13 @@ Now play with the cache:
   <summary>Solution</summary>
 
 1. Second run: everything from the cache.
-2. 8 tasks run again: `test` of all 7 affected projects, but `lint` only of `movies-util-movie-image`.
+2. 9 tasks run again: `test` of all 8 affected projects, but `lint` only of `movies-util-movie-image`.
    The `inputs` in `nx.json` decide: `test` includes `^production` (the code of the dependencies), `lint` only
    the project's own files and the ESLint config.
 3. All cache hits again: the hash is computed from the file contents, so the old results are still in the cache.
 
 > [!TIP]
-> `--skip-nx-cache` runs a task without the cache, `npx nx reset` clears it.
+> `--skip-nx-cache` runs a task without reading or writing the cache, `npx nx reset` clears it.
 
 </details>
 

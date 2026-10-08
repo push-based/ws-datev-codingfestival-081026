@@ -57,7 +57,7 @@ Theory follows the slide decks in order: "Monorepos & Nx Core" → "Nx - Scalabl
 | # | Min | | Item | Status |
 |---|---|---|---|---|
 | 1.1 | 10 | 📖 | Introduction & the story | — |
-| 1.2 | 5 | 🛠 | Exercise: project setup | 🔧 |
+| 1.2 | 5 | 🛠 | Exercise: project setup | ✅ |
 | 1.3 | 10 | 📖 | Monorepos & Nx Core — part 1: monorepos → project graph → plugins | — |
 | 1.4 | 8 | 📖 | Monorepos & Nx Core — part 2: project.json → task graph | — |
 | 1.5 | 10 | 🛠 | Exercise: task pipelines | ✅ |
@@ -68,7 +68,7 @@ Theory follows the slide decks in order: "Monorepos & Nx Core" → "Nx - Scalabl
 | 1.10 | 8 | 🛠 | Exercise: enforce module boundaries (optional — may be a demo) | ✅ |
 | 1.11 | 3 | 📖 | Outlook: Nx Cloud & AI agents (demo) | — |
 | 1.12 | 5 | 📖 | The Angular build pipeline | — |
-| 1.13 | 10 | 🛠 | Exercise: bundle analysis | 🔧 |
+| 1.13 | 10 | 🛠 | Exercise: bundle analysis | ✅ |
 
 Sum ≈ 97 min (estimates) — ~7 min over. Candidates: 1.10 as a 3-min demo, shorter intro, 1.12/1.13 shorter.
 
@@ -80,13 +80,12 @@ Sum ≈ 97 min (estimates) — ~7 min over. Candidates: 1.10 as a 3-min demo, sh
 - Show the compatibility layer live: `provideZoneChangeDetection()` in `apps/movies/src/main.ts`, `Eager` on
   all page components, decorator inputs, `subscribe`-based state, reactive forms. This is the to-do list of the day.
 
-### 1.2 🛠 Exercise: [project setup](exercises/project%20setup.md) · 5 min · 🔧
+### 1.2 🛠 Exercise: [project setup](exercises/project%20setup.md) · 5 min · ✅
 - *Tackles:* a working environment for everybody before we touch code.
-- *Progression:* check node / npm → open the IDE (+ Nx Console extension) → `npm install` → `npx nx serve movies`
+- *Progression:* check node / npm → open the IDE, accept the recommended extensions (`.vscode/extensions.json`:
+  Nx Console, Angular Language Service, ESLint, Prettier) → `npm install` → `npx nx serve movies`
   → app on `localhost:4200`.
 - *Result:* the app runs and redirects to `/list/popular`.
-- *Rework:* Nx commands instead of `ng serve`; node / CLI versions in the text are from v18 (README too);
-  `.vscode/settings.json` does not exist.
 
 ### 1.3 📖 Monorepos & Nx Core — part 1 · 10 min
 Deck "Monorepos & Nx Core", from the start up to "Demo & Exercise – Initialize Nx".
@@ -122,9 +121,10 @@ bonus from dfl `exercises/task-dependencies.md`.
   5. Task graph: `npx nx build movies --graph`, `npx nx run-many -t lint --graph`.
 - *Bonus — task dependencies:* the start state ships a `deploy` target (Docker image from `dist`, as in dfl) without
   `dependsOn`. Delete `dist`, run `npx nx run movies:deploy` → fails → add `"dependsOn": ["build"]` → runs build
-  first; check `--graph`. Without Docker: swap the command for an `echo` (dfl's fallback). Then try more `dependsOn` rules (e.g. deploy → build, test, lint) and validate them in the task graph.
+  first; check `--graph`. Without Docker: swap the command for the cross-platform fallback. Then try more `dependsOn` rules (e.g. deploy → build, test, lint) and validate them in the task graph.
 - *Result:* attendees can run tasks and read the task graph; the bonus shows task dependencies.
-- *Done:* verified on the start state; no-Docker fallback is `ls dist/apps/movies/browser` (fails without a build), not `echo`.
+- *Done:* verified on the start state; no-Docker fallback is `cd dist/apps/movies/browser && echo deployed` (fails
+  without a build; works in sh, cmd and PowerShell); `dist` is deleted with `node -e "require('fs').rmSync(…)"`.
 
 ### 1.6 📖 Monorepos & Nx Core — part 3 · 3 min
 Deck "Monorepos & Nx Core", "affected" up to "Demo & Exercise – Affected & Caching".
@@ -137,14 +137,15 @@ Source: dfl `exercises/affected-and-caching.md` (movies app + library — closer
 the tuskydesign sample; old copy nx-03, removed — `git show 90dc081:exercises/nx-03-affected-and-caching.md`).
 - *Tackles:* only run what changed, never run the same task twice.
 - *Progression:*
-  1. Commit (clean base for `affected`), `npx nx run-many -t lint test build`.
+  1. `git status` clean (stash leftovers from 1.5) → clean base for `affected`.
   2. Change something in the app (`apps/movies`) → `npx nx affected -t lint --graph` → only the app.
   3. Change a leaf library (e.g. `libs/shared/models` or `libs/movies/data-access`) → `npx nx affected -t lint --graph`
      → the library and everything that depends on it; `npx nx affected -t lint test` → only those run.
-  4. Local cache: `npx nx build movies` twice → the second run is replayed from the cache.
+  4. Local cache: `npx nx reset`, then `npx nx build movies` twice → the second run is replayed from the cache
+     (without the reset even the first run is a hit from 1.5).
 - *Result:* attendees have seen affected and the cache on their own workspace.
-- *Done:* leaf library is `movies/util-movie-image` (7 affected). Cache step shows `inputs`: after a lib change
-  `test` reruns for all 7 affected projects (`^production`), `lint` only for the changed lib.
+- *Done:* leaf library is `movies/util-movie-image` (8 affected, incl. `feature-my-movies-v2`). Cache step shows `inputs`: after a lib change
+  `test` reruns for all 8 affected projects (`^production`), `lint` only for the changed lib.
 
 ### 1.8 📖 Nx - Scalable Workspace Architectures · 10 min
 Deck "Nx - Scalable Workspace Architectures", up to "Demo & Exercise Time – scalable workspace architectures", plus the recap.
@@ -173,12 +174,14 @@ Source: summer2025 `06-enforce-module-boundaries`, rewritten for this workspace.
 - *Tackles:* the architecture exists only by convention; one library already violates it. The rule is active but
   allows everything (`*` → `*`).
 - *Progression:*
-  1. `npx nx run-many -t lint` → all green.
+  1. `npx nx run-many -t lint` → green.
   2. Replace the `*` constraint with the scope rules → 4 errors, all imports of the 2 untagged libraries.
-  3. Tag them → green again.
+  3. Tag them (`util-movie-image`: `scope:movies`, `type:util`; `feature-not-found`: `scope:shared`, `type:feature`)
+     → green again.
   4. Add the type rules → the hidden violation appears: `movies/ui-movie-list` (`movie-search-control`) injects
      `MovieService` from `movies/data-access`.
-  5. Discuss the fix (move the control into `feature-my-movies`, its only user, or pass the data in).
+  5. Discuss the fix: the control has two users (`feature-my-movies`, `feature-my-movies-v2`) — pass the data in
+     instead of injecting `MovieService`.
 - *Result:* the architecture is enforced by the linter.
 - *Done:* the start state is prepared for it either way (demo or hands-on).
 
@@ -194,19 +197,22 @@ No exercise — demo of something existing (no slides for AI yet).
 - Budgets as a guard rail — this app has none.
 - Tools: Coverage tab and `--stats-json` + esbuild analyzer.
 
-### 1.13 🛠 Exercise: [bundle-analysis-coverage_bundle-analyzer](exercises/bundle-analysis-coverage_bundle-analyzer.md) · 10 min · 🔧
+### 1.13 🛠 Exercise: [bundle-analysis-coverage_bundle-analyzer](exercises/bundle-analysis-coverage_bundle-analyzer.md) · 10 min · ✅
 - *Tackles:* what is in the initial bundle and why. Pre-Nx numbers: `main` ≈ 393 kB raw / 115 kB gzip,
   `polyfills` (zone.js) ≈ 35 kB; pages are lazy; `main` holds the app shell, rx-angular and both forms modules.
-  Start state (Nx, Angular 22.2): initial total 442 kB raw / 119 kB transfer, `main` 239 kB + a shared initial chunk 160 kB;
-  lazy chunks are named `index` now (one per feature library barrel).
+  Start state (Nx, Angular 22.2): initial total 442.6 kB raw / 119.2 kB transfer, `main` 239 kB + a shared initial
+  chunk 160 kB (`@angular/core` + rxjs) + `polyfills` 35 kB; lazy chunks: 6× `index` (5 movies features + not-found),
+  one unnamed `ui-movie-list` chunk, `movie-routes`.
 - *Progression:*
-  1. Coverage tab on `/list/popular` and a detail page → find unused code in `main`.
+  1. Coverage tab on `npx nx serve movies`, `/list/popular` → `@angular_forms.js` for one `[(ngModel)]` in the app
+     shell, `zone__js.js` via polyfills; pages are lazy.
   2. `npx nx build movies --stats-json` → read the initial-chunk table in the build output.
-  3. Load `stats.json` into the esbuild analyzer → find 1st-party and 3rd-party code in the tree map.
-  4. Save the numbers as the **baseline** for block 4.
+  3. Load `dist/apps/movies/browser-stats.json` into the esbuild analyzer → find 1st-party and 3rd-party code in the tree map.
+  4. Baseline for block 4: the numbers are in a `<details>` table in the exercise (nothing to write down).
 - *Result:* a baseline, and the first candidates (zone.js polyfills, forms modules in the shell).
-- *Rework:* Nx command and output path (`dist/apps/movies/…`); the text claims "all our code is in one bundle",
-  which is wrong; re-measure on the start state; check screenshots.
+- *Open:* re-shoot `images/bundle-analysis/coverage-tab-analysis.png` (dev server, `main.js` expanded,
+  `@angular_forms.js` / `zone__js.js` visible) and `bundle-analyzer-our-code.png` (`browser-stats.json`, `libs/` +
+  `node_modules/` in `main`).
 
 ---
 
@@ -237,13 +243,13 @@ The block will likely run over into block 3 — the overlap is taken on the fly.
 | 2.5 | — | 📖 | effect pitfalls (demo, no exercise) | — |
 | 2.6 | — | 📖 | Signals + Observables: toSignal / toObservable (demo, no exercise) | — |
 | 2.7 | — | 📖 | resource / rxResource / httpResource + signal utilities | — |
-| 2.8 | 10 | 🛠 | Exercise: signal-resource-injectParams | 🔧 |
+| 2.8 | 10 | 🛠 | Exercise: signal-resource-injectParams | ✅ |
 | 2.9 | — | 📖 | What is change detection? | — |
-| 2.10 | 5 | 🛠 | Exercise: Dirty Check (slim) | 🔧 |
+| 2.10 | 5 | 🛠 | Exercise: Dirty Check (slim) | ✅ |
 | 2.11 | — | 📖 | zone.js, OnPush, markForCheck, CD with signals | — |
-| 2.12 | 10 | 🛠 | Exercise: OnPush step 0 + signal change detection | 🚧 |
+| 2.12 | 10 | 🛠 | Exercise: OnPush step 0 + signal change detection | ✅ |
 | 2.13 | — | 📖 | Zoneless | — |
-| 2.14 | 10 | 🛠 | Exercise: zoneless | 🚧 |
+| 2.14 | 10 | 🛠 | Exercise: zoneless | ✅ |
 
 Exercises: ~55 min. Theory: the remaining ~35 min (assumed) — deck lengths are not measured, so the real
 overrun into block 3 depends on them.
@@ -309,17 +315,16 @@ Deck: 🚦 Signals + Observables, "resource / rxResource / httpResource" up to "
   `injectQueryParams` / `linkedQueryParam`; "everything signals": `injectParams` + `rxResource`.
 - Optional (deck): NgRx `selectSignal`, `connect`, `computedFrom`.
 
-### 2.8 🛠 Exercise: [signal-resource-injectParams](exercises/signal-resource-injectParams.md) · 10 min · 🔧
+### 2.8 🛠 Exercise: [signal-resource-injectParams](exercises/signal-resource-injectParams.md) · 10 min · ✅
 - *Tackles:* `MovieSearchPageComponent` — `ActivatedRoute.params.pipe(switchMap(...))` + `async` pipe, no
-  loading / error state (searching `throwError` kills the stream, the loader spins forever).
+  loading / error state (searching `throwError` kills the stream: the loader spins forever, even for the next search).
 - *Progression:*
-  1. `query` route param → `injectParams(p => p['query'])`; remove `ActivatedRoute`.
+  1. `query = injectParams(p => p['query'])` next to `movies$`.
   2. `movies = rxResource({ params: this.query, stream: ({ params }) => searchMovies(params) })`.
   3. Template: `isLoading()` → loader, `error()` → message, `hasValue()` / `value()` → list; drop `AsyncPipe`.
+  4. Delete `movies$`, the `ActivatedRoute` parameter and unused imports.
 - *Result:* signals-only component with loading and error states; a new query cancels the old request.
-- *Rework:* `stream: ({ request: query })` does not compile on v22 → `params`; remove the sentence about
-  "the previous exercise" (toSignal is a demo now); snippets use `inject()` fields while the app uses
-  constructor injection.
+- *Done:* `params`, constructor injection, toSignal sentence removed; steps reordered so each one builds.
 
 ### 2.9 📖 What is change detection?
 Deck: Angular ChangeDetection In-Depth, up to "Demo & Exercise Time — DirtyCheckComponent".
@@ -327,7 +332,7 @@ Deck: Angular ChangeDetection In-Depth, up to "Demo & Exercise Time — DirtyChe
 - The component tree of the movies app: AppComponent → MovieList → MovieCard → StarRating …
 - Default CD: `ApplicationRef.tick()` checks every component from the top down.
 
-### 2.10 🛠 Exercise: [Dirty Check](exercises/change-detection%20-%20Dirty%20Check.md) (slim) · 5 min · 🔧
+### 2.10 🛠 Exercise: [Dirty Check](exercises/change-detection%20-%20Dirty%20Check.md) (slim) · 5 min · ✅
 - *Tackles:* change detection is invisible — make it visible with a counter per component.
 - *Progression:*
   1. Import the shipped `DirtyCheckComponent` (`libs/shared/utils/src/lib/dirty-check/`, `@movies/shared/utils`) and place `<dirty-check />` in
@@ -335,8 +340,7 @@ Deck: Angular ChangeDetection In-Depth, up to "Demo & Exercise Time — DirtyChe
   2. Interact: navigate between categories, open a detail page, hover a card (tilt), toggle dark mode.
 - *Result:* every interaction bumps every counter — all components are `Eager`, zone.js ticks the whole tree.
   The counters stay in place for 2.12 and 2.14.
-- *Rework:* `DirtyCheckComponent` ships in the start state (done; the exercise text points to it); cut the
-  exercise down to "place and observe" — creating the component becomes optional reading.
+- *Done:* "place and observe"; how the component is built is optional reading in a `<details>`.
 
 ### 2.11 📖 zone.js, OnPush, markForCheck, CD with signals
 Deck: Angular ChangeDetection In-Depth, "How is that possible?" up to "Demo & Exercise Time — ChangeDetection - signals".
@@ -350,7 +354,7 @@ The deck's zone.js optimizations, OnPush and manual CD exercises are skipped —
 - CD with signals: a signal write marks only the consuming view (`RefreshView`), ancestors get
   `HAS_CHILD_VIEWS_TO_REFRESH`; targeted mode refreshes only flagged views below a clean OnPush view.
 
-### 2.12 🛠 Exercise: OnPush step 0 + [signal change detection](exercises/change-detection%20-%20signals.md) · 10 min · 🚧
+### 2.12 🛠 Exercise: OnPush step 0 + [signal change detection](exercises/change-detection%20-%20signals.md) · 10 min · ✅
 - *Tackles:* `MovieCardComponent` is `Eager`; its `TiltDirective` writes a plain field from a `fromEvent`
   subscription and only renders because zone.js ticks the whole tree.
 - *Progression:*
@@ -362,9 +366,7 @@ The deck's zone.js optimizations, OnPush and manual CD exercises are skipped —
   3. Observe: the tilt works again; only the hovered card's counter increases, not its siblings' (targeted mode).
 - *Result:* an OnPush card that updates through a signal; local change detection made visible. Parent counters
   still increase — the parents are `Eager` and zone.js ticks; "parents are not re-rendered" stays in the theory.
-- *Rework:* add step 0; fix the rename bug (step 1 names the field `rotation`, step 2 binds `rotate()` — does
-  not compile); remove the "remove markForCheck" step (no `markForCheck` in this app); rewrite the expected
-  result (siblings, not `AppComponent`). Do not switch `AppComponent` to OnPush: `MovieListPageComponent` sets
+- *Done:* step 0 added, rename bug and `markForCheck` step removed, expected result rewritten. Do not switch `AppComponent` to OnPush: `MovieListPageComponent` sets
   `this.movies` in a `subscribe`, so the list stays empty until an interaction.
 
 ### 2.13 📖 Zoneless
@@ -377,7 +379,7 @@ Deck: Angular ChangeDetection In-Depth, "Can we do better?" up to "Demo & Exerci
 - What breaks: state written into plain fields from `subscribe` / timers / `fromEvent`.
 - Deck slide title still says `provideExperimentalZonelessChangeDetection` — removed API, update the slide.
 
-### 2.14 🛠 Exercise: [change-detection - zoneless](exercises/change-detection%20-%20zoneless.md) · 10 min · 🚧
+### 2.14 🛠 Exercise: [change-detection - zoneless](exercises/change-detection%20-%20zoneless.md) · 10 min · ✅
 - *Tackles:* zone.js is opted in explicitly although zoneless is the default.
 - *Progression:*
   1. Remove `provideZoneChangeDetection()` from `apps/movies/src/main.ts`, remove `zone.js` from the
@@ -386,15 +388,17 @@ Deck: Angular ChangeDetection In-Depth, "Can we do better?" up to "Demo & Exerci
      `subscribe`; nothing schedules CD. The counters show no tick.
   3. Fix with signals: `movies` and `favoriteMovieIds` → signals, template reads them.
   4. Compare flame charts before / after: no zone frames; `polyfills` chunk (35 kB) gone.
-- *Result:* the app runs without zone.js; the tilt keeps working thanks to 2.12.
-- *Rework:* exercise uses `provideExperimentalZonelessChangeDetection` (removed) and adds it to `appConfig`
-  instead of removing the explicit zone provider; steps 2–3 do not exist yet; claims "everything still runs".
+- *Result:* the app runs without zone.js; the tilt keeps working thanks to 2.12. Hovering a card now increases
+  only that card's counter — the parents stay (zoneless ticks always run in targeted mode).
+- *Done:* rewritten along this progression. Note: the empty list can race the app shell's genres response
+  (`async` → `markForCheck`) — reload if the list shows up anyway.
 
 ### Bonus (not scheduled)
-- [signal-migration](exercises/signal-migration.md) ✅ — CLI schematics for inputs / outputs / queries.
-- [OnPush](exercises/change-detection%20-%20OnPush.md) 🔧 — the full OnPush exercise (incl. `AppComponent`
+- [signal-migration](exercises/signal-migration.md) ✅ — CLI schematics for inputs / outputs / queries (9/13 inputs, 4/5 outputs,
+  3/3 queries; then `nx format:write` + `lint --fix`).
+- [OnPush](exercises/change-detection%20-%20OnPush.md) ✅ — the full OnPush exercise (incl. `AppComponent`
   and the "nothing renders until I hover" bug).
-- [Dirty Check](exercises/change-detection%20-%20Dirty%20Check.md) — build the counter component yourself.
+- [Dirty Check](exercises/change-detection%20-%20Dirty%20Check.md) — how the counter component is built (optional `<details>` in the exercise).
 
 ---
 
@@ -407,8 +411,8 @@ Deck: Angular ChangeDetection In-Depth, "Can we do better?" up to "Demo & Exerci
 2. `form(model, schema)` → field tree; field state as signals
 3. Schema rules: `required`, `minLength`, custom `validate`; error messages in the schema
 4. Template binding: `[formField]`, `[formRoot]`
-5. Custom controls: `ControlValueAccessor` → `FormValueControl` (`value = model()`, `touch` output)
-6. Arrays: array model + `applyEach`
+5. Arrays: array model + `applyEach`
+6. Custom controls: `ControlValueAccessor` → `FormValueControl` (`value = model()`, `touch` output)
 7. Side effects: `effect` instead of `valueChanges`
 8. Submission: `submission.action`, `submit()`, `reset()`
 9. Dynamic forms: `hidden`, `disabled`, `readonly`, `applyWhen` / `applyWhenValue`
@@ -420,7 +424,7 @@ Deck: Angular ChangeDetection In-Depth, "Can we do better?" up to "Demo & Exerci
 | 3.3 | 5 | 📖 | Dynamic forms | — |
 | 3.4 | 15 | 🛠 | Exercise: signal-forms-06 (custom validation & dynamic fields) | ✅ |
 
-### 3.1 📖 Signal forms · 20 min
+### 3.1 📖 Signal forms · 15 min
 - Short history: template-driven → reactive → typed reactive. Pain points: `FormGroup` tree next to the
   component state, `valueChanges` subscriptions, hard-to-type `FormArray`s, value changes do not schedule
   zoneless CD.
@@ -430,9 +434,9 @@ Deck: Angular ChangeDetection In-Depth, "Can we do better?" up to "Demo & Exerci
 - Schema: rules on paths — `required`, `minLength`, `email`, `pattern`, …; `validate()` for custom rules;
   errors are `{ kind, message }` and live in the schema.
 - Template: `[formField]` binds an input, `<form [formRoot]>` handles submit (prevents default, marks touched).
-- Custom controls: `FormValueControl` — `value = model()`; touch is reported via a `touch` output (v22).
 - Arrays: an array signal + `applyEach` for per-item rules; iterate the array field in `@for`.
-- Submission: `form(..., { submission: { action } })`, `submit()` returns whether it ran, `reset()`.
+- Custom controls: `FormValueControl` — `value = model()`; touch is reported via a `touch` output (v22).
+- Submission: `form(..., { submission: { action } })`, `submit()` returns whether it succeeded, `reset()`.
 
 ### 3.2 🛠 Exercises: signal-forms-01…05 · 55 min · ✅
 - *Tackles:* nothing to migrate: participants build **My Movies (Signal Forms)** from an empty shell,
@@ -452,10 +456,11 @@ Deck: Angular ChangeDetection In-Depth, "Can we do better?" up to "Demo & Exerci
      (`[formField]` throws for a missing property).
   5. [A custom form field](exercises/signal-forms-05-custom-control.md): the search control (`movies/ui-movie-list`)
      CVA → `FormValueControl`; the Reactive Forms page keeps working with it (`formControlName`, v22).
-- *Result:* each exercise ends with the full code. Verified 2026-10-07 on the Nx start state: every step lints and
-  builds (`nx build movies`), clicked through in the browser.
+- *Result:* each exercise ends with the full code. Verified 2026-10-07 on the Nx start state (clicked through in the
+  browser) and again 2026-10-08 step by step: every step lints and builds (`nx build movies`). The start state's search
+  results are `type="button"` (2026-10-08), so picking a movie no longer submits the form.
 
-### 3.3 📖 Dynamic forms · 10 min
+### 3.3 📖 Dynamic forms · 5 min
 - Forms whose shape depends on their values — declared in the schema, not by enabling / disabling controls.
 - `hidden`, `disabled`, `readonly` with a reactive condition; field state reflects it (`hidden()`, `disabled()`).
 - `applyWhen(path, condition, schema)` / `applyWhenValue` (type-guard narrowing for discriminated unions).
@@ -475,15 +480,15 @@ Deck: Angular ChangeDetection In-Depth, "Can we do better?" up to "Demo & Exerci
 > First understand performance (render pipeline, Core Web Vitals, DevTools, event loop) — then take an agent for help.
 
 Theory follows the slide decks in order: "Browser Render Pipeline" → "Core Web Vitals" → "Performance Analysis &
-Flame Charts" → "JS Event Loop"; then the AI part (no decks yet). The AI part is **trainer demos** (🎬), no
-hands-on agent setup — attendees may follow along if they have an agent. Skills: **publicly available ones only**.
+Flame Charts" → "JS Event Loop"; then the AI part (no decks yet). The AI part is **hands-on**: attendees set up
+the DevTools MCP in their own agent and run public skills. Skills: **publicly available ones only**.
 
 **Technical aspects, in order**
 1. Browser render pipeline: scripting → recalc style → layout → paint → composite
 2. Core Web Vitals: LCP (+ breakdown), INP (+ phases), CLS; other vitals; measuring (Performance panel, CrUX)
 3. DevTools Performance panel: recording, throttling, tracks, main thread, tasks / long tasks, timings, frames, search
 4. Event loop: macrotasks, microtasks, rAF, idle callbacks, execution timing
-5. MCP; Chrome DevTools MCP: setup variants, capabilities, recording from a flow description
+5. MCP; Chrome DevTools MCP: setup variants, capabilities, recording from a flow description (hands-on)
 6. Streamlining performance analysis with AI: from DevTools AI assistance to agents with skills and framework knowledge
 7. Public skills on the movies app; verify by measuring
 
@@ -493,17 +498,22 @@ hands-on agent setup — attendees may follow along if they have an agent. Skill
 | 4.2 | 12 | 📖 | Core Web Vitals | — |
 | 4.3 | 3 | 🎬 | Demo: Core Web Vitals live (Performance panel live metrics, CrUX Vis) | — |
 | 4.4 | 10 | 📖 | Performance Analysis & Flame Charts | — |
-| 4.5 | 12 | 🛠 | Exercise: performance tab & flame charts | 🔧 |
+| 4.5 | 12 | 🛠 | Exercise: performance tab & flame charts | ✅ |
 | 4.6 | 8 | 📖 | JS Event Loop | — |
 | 4.7 | 5 | 🛠 | Exercise: event loop (optional) | ✅ |
 | 4.8 | 10 | 📖 | MCP & Chrome DevTools MCP | 🆕 |
-| 4.9 | 10 | 🎬 | Demo: setup, capabilities, recording from a flow description | 🆕 |
+| 4.9 | 15 | 🛠 | Exercise: DevTools MCP — setup, capabilities, recording from a flow description | 🔧 |
 | 4.10 | 5 | 📖 | Streamlining performance analysis with AI | 🆕 |
-| 4.11 | 10 | 🎬 | Demo: public performance skills on the movies app | 🆕 |
+| 4.11 | 15 | 🛠 | Exercise: public performance skills on the movies app | 🔧 |
 | 4.12 | 5 | 📖 | Wrap-up & Q&A | — |
 | (opt.) | — | 📖 | Network & image optimizations — only if time allows, between 4.7 and 4.8 | — |
 
-Sum ≈ 95 min (estimates). If block 3 runs over: 4.7 and 4.3 go first.
+Sum ≈ 105 min (estimates) — ~15 min over. If block 3 runs over: 4.7 and 4.3 go first.
+
+**Prerequisites for 4.9 / 4.11 (check with DATEV before the workshop):** an agent with MCP support per attendee
+(Copilot in VS Code, Claude Code, Cursor, …), npm registry access for `npx chrome-devtools-mcp@latest`, Chrome
+(remote debugging allowed for `--autoConnect`, otherwise the MCP starts its own instance). Add the setup to the
+project-setup exercise so it is tested at the start of the day.
 
 ### 4.1 📖 Browser Render Pipeline · 5 min
 Deck "Browser Render Pipeline".
@@ -535,18 +545,18 @@ Deck "Performance Analysis & Flame Charts".
 - Main track: tasks, task detail view, vertical call stacks, long tasks (> 50 ms) and blocking time; following async tasks.
 - Timings (custom events, DOM events, Web Vitals), frames (16 ms ≈ 60 fps), search (`Ctrl+F`).
 
-### 4.5 🛠 Exercise: [performance-tab-flame-charts](exercises/performance-tab-flame-charts.md) · 12 min · 🔧
+### 4.5 🛠 Exercise: [performance-tab-flame-charts](exercises/performance-tab-flame-charts.md) · 12 min · ✅
 - *Tackles:* black-box performance audit of the movies app with the Performance panel — the same analysis the
   agent will do in 4.9.
 - *Progression:*
   1. Record & reload → find the LCP and the LCP element (first poster); use the insights panel.
   2. Screenshots: from the loading screen to the visible movie list; mark the range, read the summary.
-  3. Search the flame chart for the `MovieListPageComponent` bootstrap.
+  3. Search the flame chart for the `MovieListPageComponent` creation (`_Factory`, dev server).
   4. Throttle the CPU, click a nav item → measure the interaction (INP) and find the culprit:
      `TrackingService.trackEvent`, a 10-million-iteration loop on every nav click.
-  5. (if time) Compare consecutive recordings; save and import a recording.
+  5. "If you have time" section: other interactions, compare recordings, save / import, bonus.
 - *Result:* everybody can read LCP and INP in a trace — and knows the INP problem the agent should find in 4.9.
-- *Rework:* trim to steps 1–4; check screenshots; paths after the Nx start state.
+- *Open:* re-shoot `images/performance-tab/movie-list-component-bootstrap.png` (webpack-era file name).
 
 ### 4.6 📖 JS Event Loop · 8 min
 Deck "JS Event Loop".
@@ -581,32 +591,48 @@ Deck "JS Event Loop".
 - **Limits:** lab data only; the agent sees everything in the browser (use `--isolated`, no sensitive sessions);
   officially Chrome only.
 
-### 4.9 🎬 Demo: setup, capabilities, recording from a flow description · 10 min · 🆕
-- *Shows:* the MCP setup live and what the agent can do with the movies app.
+### 4.9 🛠 Exercise: [DevTools MCP](exercises/ai-devtools-mcp.md) — setup, capabilities, recording from a flow description · 15 min · 🔧
+- *Tackles:* give your own agent a browser and let it analyse the movies app — without any configuration.
+- *Session without repo access:* the agent runs in an empty playground folder — in the repo it could grep the code
+  and read the solutions in `exercises/`. Results depend heavily on model and reasoning effort.
 - *Progression:*
-  1. Setup live: one variant from 4.8 (e.g. Claude Code + `--autoConnect` to the trainer's running Chrome).
-  2. Capabilities: navigate to `/list/popular`, take a screenshot, read the console, list network requests.
-  3. **Recording from a flow description**, e.g.:
-     > "Open /list/popular with 4x CPU throttling. Record a performance trace while you scroll the list, click
-     > 'Top Rated' and open the first movie. Report LCP, INP and the three longest tasks with their call stacks."
-  4. Compare the agent's findings with the attendees' own trace from 4.5 (`TrackingService.trackEvent`).
-- *Bridge to 4.10:* the prompt works — but it has to be typed again every time, and the agent improvises each run.
+  1. Setup: add the Chrome DevTools MCP (user scope for the workshop) — scope first (project = committed, user = all projects, local = only you in
+     this repo); per agent in `<details>` (Claude Code `--scope`, VS Code `.vscode/mcp.json` / global, Cursor, Gemini, Codex).
+  2. Connected? Server status in the agent, ask it which `chrome-devtools` tools it has; if not, let the agent debug
+     its own setup (restart, `npx` path in GUI IDEs, npm registry access, VS Code trust).
+  3. Capabilities: screenshot, console, `image.tmdb.org` requests. Prompts name the server — agents with built-in
+     browser tools pick those otherwise.
+  4. One prompt: page resized to 1440x900, 4x CPU, trace starts with a reload (no auto-stop), flow (scroll down once
+     until the next page loads, "Top Rated", first movie), saved as `tmp/desktop.json.gz` in the repo (git-ignored),
+     "tell me about the performance problems". Attendees load the trace in the Performance panel and check it starts
+     with the load and shows the flow. Recoveries: burger menu, `--workspace` for "Access denied", `click` tool for an
+     empty interactions track.
+  5. Same flow on a phone: `emulate` viewport / user agent / Fast 4G → `tmp/mobile.json.gz`; the side menu sits
+     behind the burger button.
+  6. Review the findings: check one finding yourself in the trace / code, then compare with the solution list of the problems the app
+     actually has (`trackEvent`, LCP poster, eager w780 posters, no preconnect, fonts, late genres);
+     watch for dev-server artefacts and generic advice. Shows whether the agent alone is good enough.
+- *Result:* every attendee has a working DevTools MCP and has seen what the agent finds (and misses).
+- *Bridge to 4.10:* the analysis works — but it is improvised and changes from run to run; 4.11 gives the agent a
+  process (skills) and context.
+- *Rework:* written (setup per agent in `<details>`, `--autoConnect` + privacy flags as bonus; no agent → pair up);
+  needs a dry run with at least Copilot / VS Code and Claude Code on the start state.
 - *Expected findings in the app* (also reference material for the optional network & image part):
 
   | Problem | Evidence in the app | Fix | Reference |
   |---|---|---|---|
   | Slow nav click (INP) | `TrackingService.trackEvent` busy loop | defer / remove | — |
-  | All posters eager, w780 | `movie-card` `<img>` without `loading` / `fetchpriority` / size | lazy for the rest, eager + high for the first | [lazy-loading](exercises/network-lazy-loading.md) 🔧 needs signal migration (`movie()`, `index()`) |
+  | All posters eager, w780 | `movie-card` `<img>` without `loading` / `fetchpriority` / size | lazy for the rest, eager + high for the first | [lazy-loading](exercises/network-lazy-loading.md) ✅ decorator inputs |
   | No connection hints | `index.html` has none; 4 origins (api / image TMDB, Google Fonts css / files) | `preconnect` (+ `crossorigin` for api, gstatic) | [preconnect](exercises/network-resource-hints-preconnect.md) ✅ |
-  | Font swap → CLS | Poppins loaded late on the detail page | `preload` woff2 | [preload-prefetch](exercises/network-resource-hints-preload-prefetch.md) 🔧 font URLs are `v23`, Google now serves `v24` |
-  | Genres requested from the template | `genres$ = getGenres()` in the app shell, `async` in template | `shareReplay` + `provideAppInitializer` | [prefetch-lcp-data](exercises/network-prefetch-lcp-data.md) 🔧 uses `APP_INITIALIZER` / `NgModule` |
-  | Images not optimised | no `NgOptimizedImage` | `ngSrc` + `priority`, TMDB loader + `ngSrcset` | [ng-optimized-images](exercises/ng-optimized-images.md) 🔧 missing `NgOptimizedImage` import, step 2 DRAFT |
+  | Font swap → CLS | Poppins loaded late on the detail page | `preload` woff2 | [preload-prefetch](exercises/network-resource-hints-preload-prefetch.md) ✅ `v24`, dev server only |
+  | Genres requested from the template | `genres$ = getGenres()` in the app shell, `async` in template | `shareReplay` + `provideAppInitializer` | [prefetch-data](exercises/network-prefetch-lcp-data.md) ✅ `provideAppInitializer` |
+  | Images not optimised | no `NgOptimizedImage` | `ngSrc` + `priority`, TMDB loader + `ngSrcset` | [ng-optimized-images](exercises/ng-optimized-images.md) ✅ step 2 written |
 
 ### 4.10 📖 Streamlining performance analysis with AI · 5 min · 🆕 (no deck yet)
 A ladder — each step gives the AI more structure and less room to guess:
 1. **DevTools AI assistance** — "Ask AI" on a trace or an insight. Zero setup; limited to what is on screen;
    can be disabled by enterprise policy (check for DATEV).
-2. **Agent + DevTools MCP, ad-hoc prompts** — the 4.9 demo. Flexible, but improvised, not reproducible, token-heavy.
+2. **Agent + DevTools MCP, ad-hoc prompts** — the 4.9 exercise. Flexible, but improvised, not reproducible, token-heavy.
 3. **Agent + skills** — the prompt becomes a skill: a `SKILL.md` (name, description, instructions, optional
    scripts / references), loaded only when the task matches (progressive disclosure; open standard, supported by
    most agents). Holds the flow, the measurement protocol (throttling, runs, thresholds) and an analysis checklist.
@@ -614,33 +640,46 @@ A ladder — each step gives the AI more structure and less room to guess:
    `onpush_zoneless_migration`), the official Angular skills (`angular-developer`), `AGENTS.md` / best-practices
    files from angular.dev → fixes in idiomatic Angular instead of generic web advice.
 
-**Skills vs. specialized agents** (tiny section):
-- *Skill* — know-how loaded into the **main** agent's context when the task matches; the agent stays the same.
-- *Specialized agent (sub-agent)* — a separate agent with its own instructions, its own tool set (e.g. only the
-  DevTools MCP) and its **own context window**; the main agent delegates "analyse this page" and gets a short report back.
-- Why it matters for performance: traces, network lists and console dumps are huge — a specialized agent keeps them
-  out of the main conversation, can run several analyses in parallel (e.g. one per route), and can be restricted to
-  read-only tools.
-- Combine both: a specialized "performance analyst" agent that uses the performance skills.
-- Most agent tools support them (e.g. Claude Code sub-agents in `.claude/agents/`, custom agents in Copilot / Cursor).
+**Skills vs. custom agents** (tiny section):
+- *Skill* — **what to do**: a folder with `SKILL.md` (+ optional scripts / references), loaded on demand into the
+  agent that is already running. Open standard (agentskills.io) — the same skill works in Claude Code, Copilot
+  (VS Code, CLI, cloud agent), Codex, Gemini CLI, … Example: `performance` from web-quality-skills.
+- *Custom agent* — **who does it**: a role definition = system prompt + allowed tools (e.g. only the DevTools MCP) +
+  model, optionally preloaded skills / MCP servers. Not a shared standard: Claude Code `.claude/agents/*.md`,
+  VS Code / Copilot `.github/agents/*.agent.md` (VS Code also reads `.claude/agents`).
+- Two ways to use a custom agent: as the **main session** (pick it in VS Code, `claude --agent …`), or as a
+  **sub-agent** the main agent delegates to — then it runs in its **own context window** and only returns a summary.
+- Why that matters for performance: traces, network lists and console output are large — a "performance analyst"
+  sub-agent keeps them out of the main conversation and hands back the findings.
+- Combine both: the analyst agent preloads the performance skills (Claude Code: `skills:` in the agent file);
+  the other way round, a skill can run in a sub-agent (`context: fork`).
 
 Rule on every step: the agent proposes, the trace decides.
 
-### 4.11 🎬 Demo: public performance skills on the movies app · 10 min · 🆕
-- *Shows:* step 3 + 4 of the ladder with publicly available skills only.
-- *Skills used:*
-  - Chrome DevTools MCP plugin skills (repo `ChromeDevTools/chrome-devtools-mcp`): **`debug-optimize-lcp`** (LCP
-    breakdown → sub-part → fix playbook), `chrome-devtools` (general usage); `memory-leak-debugging`, `a11y-debugging`
-    to mention.
-  - Angular skills (`npx skills add https://github.com/angular/skills`): `angular-developer`; optionally the Angular CLI MCP.
+### 4.11 🛠 Exercise: [public performance skills](exercises/ai-performance-skills.md) on the movies app · 15 min · 🔧
+- *Tackles:* step 3 of the ladder — a skill gives the 4.9 audit a process; publicly available skills only.
+- *Skills used:* Addy Osmani's [web-quality-skills](https://github.com/addyosmani/web-quality-skills): **`performance`**
+  (evidence-led audit: baseline → trace insights → fix only measured bottlenecks → re-measure) and `core-web-vitals`
+  (LCP / INP / CLS causes and fixes). Not used: `debug-optimize-lcp` (LCP only, not a holistic audit), Angular skills
+  (no performance guidance).
 - *Progression:*
-  1. Show the installed skills and one `SKILL.md` (structure, description, workflow).
-  2. Run `debug-optimize-lcp` on `/list/popular` → the agent walks the LCP breakdown and names the poster image
-     problems (eager w780, no priority).
-  3. Let it apply one fix (with Angular knowledge: e.g. `NgOptimizedImage` + `priority` on the first card).
-  4. Re-record → compare LCP before / after.
-- *Note:* there is no public INP skill — the INP finding stays with the ad-hoc prompt from 4.9 (a good contrast).
-- *Rework:* dry-run the demo on the start state; check which skills the plugin installs at workshop time.
+  1. Install globally (`-g`, playground + repo): `npx skills add addyosmani/web-quality-skills --skill performance`
+     (+ `core-web-vitals`); Claude Code plugin as alternative. Steps 1–3 in the playground session, step 4 (fix) in the repo.
+  2. Read `performance/SKILL.md` + `references/MEASUREMENT.md`: frontmatter (`description` = trigger), 4-step
+     workflow; what the 4.9 prompt lacked (measured vs. hypothesis, conditions, no CrUX on localhost, ≥ 3 runs median + range
+     — `MEASUREMENT.md`; budgets — `SKILL.md`).
+  3. Stop the dev server first (same port). Same flow as 4.9, traces `tmp/skill-*.json.gz`; the production build
+     inlines the Google Fonts CSS and adds a gstatic preconnect, so those findings drop out. The prompt names the skill ("Use the performance skill and the chrome-devtools MCP") but not
+     how to analyse. Attendees check the agent read `SKILL.md`, compare the report with the 4.9 solution list and
+     the 4.9 report (old chat).
+  4. Fix the LCP poster, agent measures median of 3 before / after under the same conditions; attendees load one
+     before and one after trace in the Performance panel. Reference: `loading` / `fetchpriority` via the existing `index` input (verified: lint +
+     build green). Bonus: fix the nav click (remove the `trackEvent` loop — deferring it still blocks the main thread).
+- *Bonus:* a "performance analyst" custom agent (Claude Code `.claude/agents/`, VS Code `.github/agents/`) with the
+  DevTools MCP tools only and the performance skills preloaded.
+- *Result:* a skill-guided audit compared with the improvised one, and one measured fix.
+- *Rework:* written; needs a dry run with an agent on the start state (skill behaviour and findings are not measured
+  yet); measured with `nx serve movies --configuration=production`.
 
 ### 4.12 📖 Wrap-up & Q&A · 5 min
 No exercise.
@@ -675,14 +714,14 @@ removed), `index.html` quote, SSR leftovers removed, README node versions.
    Enforce Module Boundaries), Nx before the Angular build; builds run through the Nx executor (`@nx/angular:application`).
    Module boundaries exercise optional (may be a demo), start state prepared for it.
 11. (2026-10-07) Block 4: theory follows the four performance decks (render pipeline → CWV → performance analysis →
-   event loop); the AI part (DevTools MCP, AI approaches, skills) is trainer demos; only publicly available skills.
+   event loop); the AI part (DevTools MCP, skills) is hands-on exercises; only publicly available skills.
 12. (2026-10-07) Block 1: no scalable-workspace-architectures exercise (generate a feature library) — dropped.
 
 ## Open questions
 
 1. Publish `push-based/ws-datev-codingfestival-081026` on GitHub — public or private?
-2. Block 4 AI part is demo-only; attendees following along need an agent + Chrome — what does DATEV allow? (also: is DevTools AI assistance enabled?)
-3. Block 4 (optional network part) reference solutions for lazy loading / `NgOptimizedImage` assume the signal migration (bonus in block 2) — rewrite them for decorator inputs, or make the migration part of the start state for block 4?
+2. Block 4 AI exercises need an agent with MCP support + npm registry access + Chrome per attendee — what does DATEV allow / provide? (also: is DevTools AI assistance enabled?)
+3. ~~Block 4 reference solutions assume the signal migration~~ — rewritten for decorator inputs (2026-10-08).
 4. ~~All exercises reference the pre-Nx paths~~ — updated with the start state.
 
 ## Dropped from the sources

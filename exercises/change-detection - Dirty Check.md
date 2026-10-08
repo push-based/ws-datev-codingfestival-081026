@@ -1,35 +1,28 @@
-# ChangeDetectionStrategy DirtyCheck Exercises
+# ChangeDetection - Dirty Check Exercise
 
-In this exercise we will focus on basic runtime optimizations in angular applications by using our knowledge about
-the `ChangeDetection` system in angular. Before we can do any optimization, let's get a picture of the current state.
+In this exercise we will make the `ChangeDetection` system of angular visible. Before we can do any optimization,
+let's get a picture of the current state.
 
-We will create a little helper component that will assist us to debug change detection cycles in our application.
+The workspace already ships a little helper component that counts how often change detection checks the component
+it is placed in: `DirtyCheckComponent` in `libs/shared/utils/src/lib/dirty-check/dirty-check.component.ts`,
+exported from `@movies/shared/utils`.
 
-## 1. Create a dirty checks component
+## 1. How the dirty-check component works (optional)
 
-Your task is to create a `DirtyChecksComponent` which should serve as a performance debug utility.
-Whenever the application renders, it should increase a number in its template.
+<details>
+    <summary>DirtyCheckComponent</summary>
 
-> [!NOTE]
-> The workspace already ships this component: `DirtyCheckComponent` in
-> `libs/shared/utils/src/lib/dirty-check/dirty-check.component.ts`, exported from `@movies/shared/utils`.
-> Read steps 1 and 2 to understand how it works, then continue with step 3.
-
-```bash
-# how it was generated
-npx nx g @nx/angular:component libs/shared/utils/src/lib/dirty-check/dirty-check
-```
-
-The component should have a `checked: Signal<number>` as a field and bind it in the template.
-
-Use the following skeleton:
+Whenever change detection checks the host component, the `ngDoCheck` hook of the `DirtyCheckComponent` runs and
+increases the `checked` signal.
 
 ```ts
-import { Component, signal } from '@angular/core';
+// libs/shared/utils/src/lib/dirty-check/dirty-check.component.ts
 
+import { Component, DoCheck, signal } from '@angular/core';
+
+/** Counts how often its host view is checked. Use `<dirty-check />` in a template. */
 @Component({
   selector: 'dirty-check',
-  
   template: ` <code class="dirty-checks">({{ checked() }})</code> `,
   styles: [
     `
@@ -41,88 +34,124 @@ import { Component, signal } from '@angular/core';
         font-size: var(--text-lg);
       }
     `,
-  ]
+  ],
 })
-export class DirtyCheckComponent {
-  checked = signal(0);
-}
-
-```
-
-## 2. Implement dirty check logic
-
-Now it's time to build a simple logic to determine if the component got checked or not. Whenever change detection runs,
-we want the `checked` signal to increase its value.
-
-For this to work, use the `ngDoCheck` Lifecycle hook. You need to let `DirtyCheckComponent` implement the `DoCheck` interface.
-
-Whenever the `ngDoCheck` lifecycle hook runs, just increase the value of the signal.
-
-<details>
-    <summary>Dirty Checking</summary>
-
-```typescript
-// libs/shared/utils/src/lib/dirty-check/dirty-check.component.ts
-
-import {Component, DoCheck} from "@angular/core";
-
-@Component(/**/)
 export class DirtyCheckComponent implements DoCheck {
   checked = signal(0);
 
   ngDoCheck() {
-    this.checked.update(c => c + 1);
+    this.checked.update((c) => c + 1);
   }
 }
 ```
+
 </details>
 
-## 3. Use the dirty-check component
+## 2. Use the dirty-check component
 
-Afterward, use the `<dirty-check />` in multiple components to visualize their respective amount
-of dirty checks while the application is running.
+Place `<dirty-check />` in three components to visualize their respective amount of dirty checks while the
+application is running. Keep the counters for the following change detection exercises.
 
-After each usage, go and check your application and see numbers going wild when interacting with the app.
+### 2.1 Use in `AppComponent`
 
-### 3.1 Use in `AppComponent` template 
+Import `DirtyCheckComponent`, add it to the `imports` array and put `<dirty-check />` into the template:
 
-Add the import in `apps/movies/src/app/app.component.ts` and include it in the imports section
+```ts
+// apps/movies/src/app/app.component.ts
 
-```typescript
-// Include dirty checks component import here.
-
-import { DirtyCheckComponent } from '@movies/shared/utils';
+import { DirtyCheckComponent } from '@movies/shared/utils'; // 👈️ add this
 
 @Component({
-    selector: 'app-root',
-                                    // 👇️
-    imports: [RouterOutlet, AppShellComponent, DirtyCheckComponent],
-  // ...
+  selector: 'app-root',
+  template: `
+    <app-shell>
+      <dirty-check />
+      <router-outlet />
+    </app-shell>
+  `,
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [RouterOutlet, AppShellComponent, DirtyCheckComponent],
 })
+export class AppComponent {}
 ```
 
-Add `<dirty-check />` component in the `AppComponent` template:
+### 2.2 Use in `MovieListPageComponent`
+
+Same for `libs/movies/feature-movie-list/src/lib/movie-list-page/movie-list-page.component.ts`, put
+`<dirty-check />` above `<movie-list>`:
+
+```ts
+// libs/movies/feature-movie-list/src/lib/movie-list-page/movie-list-page.component.ts
+
+import {
+  DirtyCheckComponent,
+  ElementVisibilityDirective,
+} from '@movies/shared/utils';
+
+@Component({
+  selector: 'movie-list-page',
+  template: `
+    <dirty-check />
+    <movie-list
+      [movies]="movies"
+      [favoriteMovieIds]="favoriteMovieIds"
+      (favoriteToggled)="handleFavoriteToggled($event)"
+    />
+    <div (elementVisible)="paginate$.next()"></div>
+  `,
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [
+    MovieListComponent,
+    ElementVisibilityDirective,
+    DirtyCheckComponent,
+  ],
+})
+export class MovieListPageComponent {
+  // ...
+}
+```
+
+### 2.3 Use in `MovieCardComponent`
+
+Same for `libs/movies/ui-movie-list/src/lib/movie-card/movie-card.component.ts`, put `<dirty-check />` as the
+first child of `.movie-card`:
 
 ```html
-template: `
-  <app-shell>
-    <!-- Add dirty checks here -->
-    <dirty-check />
-    <router-outlet />
-  </app-shell>
-`,
+<!-- libs/movies/ui-movie-list/src/lib/movie-card/movie-card.component.ts (template) -->
+
+<div class="movie-card">
+  <dirty-check /> <!-- 👈️ add this -->
+  <img tilt ... />
+  <!-- the rest of the template stays as it is -->
+</div>
 ```
 
-### 3.2 Use in `MovieListPageComponent` & `MovieCardComponent`
+```ts
+// libs/movies/ui-movie-list/src/lib/movie-card/movie-card.component.ts
 
-Repeat the steps done in `AppComponent`, but for more components. You can choose to put it everywhere if you like :).
+import { DirtyCheckComponent, TiltDirective } from '@movies/shared/utils';
 
-![in-usage](./images/change-detection/dirty-checks-in-use.PNG)
+@Component({
+  selector: 'movie-card',
+  // ...
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [
+    TiltDirective,
+    StarRatingComponent,
+    UpperCasePipe,
+    MovieImagePipe,
+    DirtyCheckComponent,
+  ],
+})
+export class MovieCardComponent {
+  // ...
+}
+```
 
-## 4. Evaluate initial state of the application
+## 3. Evaluate initial state of the application
 
-Serve your app and try to interact with the page. You will see counter always go up.
-Perform different kinds of actions and note how the counter will increase by different amounts.
+Serve your app and try to interact with the page.
+Perform different kinds of actions and note how the counters increase by different amounts.
 
 * navigate
   * between categories
@@ -130,3 +159,6 @@ Perform different kinds of actions and note how the counter will increase by dif
 * tilt
 * switch dark/light mode
 
+Every interaction bumps every counter: all components are `Eager`, and zone.js ticks the whole tree.
+
+![in-usage](./images/change-detection/dirty-checks-in-use.PNG)

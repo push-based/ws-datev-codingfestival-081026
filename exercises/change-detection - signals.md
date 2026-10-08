@@ -1,19 +1,46 @@
 # ChangeDetection - Signals Exercise
 
-This exercise is here to showcase how powerful signal change detection is. We are not quite at the level
-we get with signal components, but we are close to it already.
+This exercise is here to showcase how powerful signal change detection is. Keep the `<dirty-check />` counters
+from the [Dirty Check exercise](./change-detection%20-%20Dirty%20Check.md).
 
 ## TiltDirective signal CD
 
-We are going to slightly adjust the `TiltDirective` in order to make use of the new signal based
-change detection.
+**0. Make `MovieCardComponent` OnPush**
 
-Open the `TiltDirective` and..
+In `libs/movies/ui-movie-list/src/lib/movie-card/movie-card.component.ts`, delete the
+`changeDetection: ChangeDetectionStrategy.Eager` line and the now unused import. Without it, the component uses
+`OnPush` — the default since Angular 22.
+
+```diff
+// libs/movies/ui-movie-list/src/lib/movie-card/movie-card.component.ts
+
+import {
+- ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
+
+@Component({
+  // ...
+- changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [
+    // ...
+  ],
+})
+export class MovieCardComponent {}
+```
+
+Hover over the movie cards: the card counters stop — and the tilt breaks. The `TiltDirective` writes a plain
+field in a `fromEvent` subscription, which doesn't mark the OnPush card dirty.
 
 **1. Transform `rotate` into a signal**
 
-Refactor the `rotate` field from a static property to a `signal()`. Set the initial value to `rotate(0deg)`
-Update all the code that updates the `rotate` field to use the signal `set` or `update` apis.
+Open the `TiltDirective` (`libs/shared/utils/src/lib/tilt.directive.ts`).
+Refactor the `rotate` field from a plain property to a `signal()`. Set the initial value to `rotate(0deg)`.
+Update the code that updates the `rotate` field to use the signal `set` api.
 
 <details>
   <summary>TiltDirective rotate signal</summary>
@@ -21,14 +48,19 @@ Update all the code that updates the `rotate` field to use the signal `set` or `
 ```diff
 // libs/shared/utils/src/lib/tilt.directive.ts
 
+- import { Directive, ElementRef, Input } from '@angular/core';
++ import { Directive, ElementRef, Input, signal } from '@angular/core';
+```
+
+```diff
 - rotate = 'rotate(0deg)';
-+ rotation = signal('rotate(0deg)');
++ rotate = signal('rotate(0deg)');
 ```
 
 ```diff
 merge(rotate$, reset$).subscribe((rotate) => {
 - this.rotate = rotate;
-+ this.rotation.set(rotate);
++ this.rotate.set(rotate);
 });
 ```
 
@@ -46,58 +78,28 @@ In order for everything to work, we need to call the signal in the host binding.
 
 @Directive({
   selector: '[tilt]',
-  
   host: {
-    '[style.transform]': 'rotate()' // <-- update this line
-  }
+    '[style.transform]': 'rotate()', // <-- update this line
+  },
 })
 export class TiltDirective {
   //...
 }
-
-
 ```
 
 </details>
 
-**3. Remove markForCheck call**
-
-Because we are using signals, we don't need to call `markForCheck` anymore. Change detection should just work.
-
-
-<details>
-  <summary>TiltDirective remove markForCheck</summary>
-
-```diff
-// libs/shared/utils/src/lib/tilt.directive.ts
-
-@Directive(...)
-export class TiltDirective {
-  constructor(private elementRef: ElementRef<HTMLElement>) {
-    // ...
-    merge(rotate$, reset$).subscribe((rotate) => {
-      this.rotation.set(rotate);
--     this.cdr.markForCheck(); // <-- remove this line
-    });
-  }
-}
-```
-
-</details>
-
-
-Great! Please take a look at your application and be amazed by the change detection counters.
-🔥🔥🔥🔥
-
+Hover over the movie cards again: the tilt works, and only the hovered card's counter increases.
 
 <details>
   <summary>Signals ChangeDetection result</summary>
 
 #### Explanation:
 - The TiltDirective uses a signal to update the rotation value
-- Because nothing is being marked for check, the `AppComponent` is not dirty checked (the counter doesn't increase anymore)
-- The `MovieCardComponent` is refreshed (the counter increases) because a signal was updated
-- 🎉 This means we can refresh child components without refreshing any parent component (Local Change Detection)!
+- The hovered `MovieCardComponent` is refreshed (the counter increases) because a signal was updated, its OnPush
+  siblings are skipped (Local Change Detection)
+- The parents are still checked: they are `Eager` and zone.js ticks the whole tree. That changes when we go
+  [zoneless](./change-detection%20-%20zoneless.md).
 
 ![signals-cd.gif](images/change-detection/signals-cd.gif)
 

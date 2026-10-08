@@ -6,8 +6,8 @@ And in a real app, saving means talking to a server: it takes time, and the serv
 ## Goal
 
 At the end of this exercise the form knows how to submit itself. `[formRoot]` handles the submit event, the
-form's `submission` option sends the movie to the app's fake backend, the button shows a loading state, server errors land
-on the right field and an invalid submit focuses the first broken field.
+form's `submission` option sends the movie to the app's fake backend, the button shows a loading state, server errors
+land on the right field and an invalid submit focuses the first broken field.
 
 > The relevant files are:
 > - `libs/movies/data-access/src/lib/movie.service.ts` (read only)
@@ -22,7 +22,7 @@ A real submit talks to a server. So that we don't need one, the app already cont
 * it is `async`, like a real HTTP call, and only answers after **one second**: long enough to see a loading state
 * our "moderators" reject comments that contain the word `spoiler`: the method then **throws an `Error`**, just
   like a request that fails
-* it doesn't store anything: keeping the favorites list stays the job of our component
+* on success it stores the new favorite, just like a server would
 
 That gives us everything a real submit has to handle: waiting, success and a server-side error.
 
@@ -37,7 +37,7 @@ That gives us everything a real submit has to handle: waiting, success and a ser
  *
  * Pretends to save a new favorite on a server: it answers after one second, and the
  * "moderation" rejects comments that contain the word "spoiler" by throwing an error,
- * just like an HTTP call that fails. Storing the list stays the component's job.
+ * just like an HTTP call that fails. Accepted favorites are appended to the stored list.
  */
 async addFavorite(
   favorite: TMDBMovieModel & { comment: string },
@@ -46,6 +46,7 @@ async addFavorite(
   if (/spoiler/i.test(favorite.comment)) {
     throw new Error('Our moderators rejected this comment: no spoilers!');
   }
+  this.setFavorites([...this.getFavorites(), favorite]);
 }
 ```
 
@@ -62,17 +63,21 @@ The `action`:
 * only runs when the form is **valid**
 * returns `undefined` when everything went fine
 
-Inject the `MovieService` with `inject()`, then move the logic of `add()` into the action: read the value,
-`await this.movieService.addFavorite()`, store the movie and reset the form. Then delete `add()`.
+Inject the `MovieService` with `inject()`, then write the action: read the value,
+`await this.movieService.addFavorite()` and reset the form. Keep `add()` for now: the template
+still calls it, we replace it in step 3.
 
-Our page doesn't show the favorites list yet, that's exercise 4. Until then, store the movie with
-`movieService.setFavorites()`, appended to `movieService.getFavorites()`.
+The action only runs when the form is valid, so `required` guarantees a movie: the cast `movie as TMDBMovieModel` is
+safe.
 
 <details>
   <summary>submission.action</summary>
 
 ```ts
 // libs/movies/feature-my-movies-v2/src/lib/my-movie-list-v2/my-movie-list-v2.component.ts
+
+import { inject } from '@angular/core';
+import { MovieService } from '@movies/movies/data-access';
 
 private movieService = inject(MovieService);
 
@@ -90,14 +95,10 @@ protected readonly addForm = form(
     submission: {
       action: async (addForm) => {
         const { movie, comment } = addForm().value();
-        const favorite = { ...movie!, comment };
+        const favorite = { ...(movie as TMDBMovieModel), comment };
 
         await this.movieService.addFavorite(favorite);
 
-        this.movieService.setFavorites([
-          ...this.movieService.getFavorites(),
-          favorite,
-        ]);
         this.reset();
         return undefined;
       },
@@ -111,7 +112,7 @@ protected readonly addForm = form(
 ## 3. Let `[formRoot]` submit
 
 Replace `novalidate (submit)="add($event)"` with the `[formRoot]` directive and pass it `addForm`. Add `FormRoot` to
-the component `imports`.
+the component `imports`. Then delete `add()`: nothing calls it anymore.
 
 `[formRoot]` does everything our `add()` did by hand:
 
@@ -198,7 +199,7 @@ The form adds the error to that field, so it shows up in the comment's `errors()
 
 action: async (addForm) => {
   const { movie, comment } = addForm().value();
-  const favorite = { ...movie!, comment };
+  const favorite = { ...(movie as TMDBMovieModel), comment };
 
   try {
     await this.movieService.addFavorite(favorite);
@@ -210,10 +211,6 @@ action: async (addForm) => {
     };
   }
 
-  this.movieService.setFavorites([
-    ...this.movieService.getFavorites(),
-    favorite,
-  ]);
   this.reset();
   return undefined;
 },
@@ -322,7 +319,7 @@ export class MyMovieListV2Component {
       submission: {
         action: async (addForm) => {
           const { movie, comment } = addForm().value();
-          const favorite = { ...movie!, comment };
+          const favorite = { ...(movie as TMDBMovieModel), comment };
 
           try {
             await this.movieService.addFavorite(favorite);
@@ -334,10 +331,6 @@ export class MyMovieListV2Component {
             };
           }
 
-          this.movieService.setFavorites([
-            ...this.movieService.getFavorites(),
-            favorite,
-          ]);
           this.reset();
           return undefined;
         },

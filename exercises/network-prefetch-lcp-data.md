@@ -1,4 +1,4 @@
-# Network: Prefetch LCP Data
+# Network: Prefetch HTTP Data
 
 ## 1. Prefetch http resources as early as possible
 
@@ -19,20 +19,19 @@ Start by looking at the code and go to the `AppShellComponent`. You should find 
 ```ts
 // libs/movies/feature-app-shell/src/lib/app-shell/app-shell.component.ts
 
-readonly genres$ = this.movieService.getGenres();
+genres$ = this.movieService.getGenres();
 ```
 
 ```html
-<!--app-shell.component.html-->
+<!-- libs/movies/feature-app-shell/src/lib/app-shell/app-shell.component.html -->
 
-<a
-  [attr.data-uf]="'menu-gen-'+genre.id"
-  *ngFor="let genre of genres$ | async;"
-  class="navigation--link"
-  [routerLink]="['/list', 'genre', genre.id]"
-  routerLinkActive="active"
->
-
+@for (genre of genres$ | async; track genre) {
+  <a
+    class="navigation--link"
+    (click)="trackNavigation('list/genre-' + genre.id)"
+    [routerLink]="['/list', 'genre', genre.id]"
+    routerLinkActive="active"
+  >
 ```
 </details>
 
@@ -48,27 +47,27 @@ Go to the `Network` section and search for the request made to
 `https://api.themoviedb.org/3/genre/movie/list`. Take a look at the timing when it is queued.
 
 By combining this view with the flame-chart view, you should be able to pinpoint the exact 
-location where the request is made in the code: `AppShellComponentTemplate`.
+location where the request is made in the code: `AppShellComponent_Template`.
 
 ![genre-request-template](images/network/genre-request-template.png)
 
 As we now found out where the problem is, let's find a solution.
-Your goal is to provide and implement an `APP_INITIALIZER` where we 
+Your goal is to provide an app initializer (`provideAppInitializer`) where we 
 will pre-fetch the genre data of the `MovieService`.
 
 For this, we first need to touch the `MovieService` as well as the `AppShellComponent`.
 
-Let's go ahead and introduce a `genre$: Observable<TMDBMovieGenreModel[]>`
+Let's go ahead and introduce a `genres$: Observable<TMDBMovieGenreModel[]>`
 as a field in the `MovieService`.
 You can also delete the method `getGenres()` as we don't need it anymore.
 
-The `genre$` observable should get assigned to the http call being made before
+The `genres$` observable should get assigned to the http call being made before
 in `getGenres()`.
 
-The final trick will be to add the `shareReplay` rxjs operator the `genres$` Observable,
+The final trick will be to add the `shareReplay` rxjs operator to the `genres$` Observable,
 as we want to pre-fetch it in an early stage and cache it for later re-usage.
 
-In `AppShellComponent` change the access from `getGenres()` to `genre$`.
+In `AppShellComponent` change the access from `getGenres()` to `genres$`.
 
 <details>
   <summary>Show solution</summary>
@@ -76,14 +75,18 @@ In `AppShellComponent` change the access from `getGenres()` to `genre$`.
 ```ts
 // libs/movies/data-access/src/lib/movie.service.ts
 
-readonly genres$ = this.httpClient
-  .get<{ genres: TMDBMovieGenreModel[] }>(
-    `${environment.tmdbBaseUrl}/3/genre/movie/list`
-  )
-  .pipe(
-    map(({ genres }) => genres),
-    shareReplay({ bufferSize: 1, refCount: true })
-  );
+import { map, Observable, shareReplay, tap, timer } from 'rxjs';
+
+// ...
+
+  readonly genres$ = this.httpClient
+    .get<{
+      genres: TMDBMovieGenreModel[];
+    }>(`${this.env.tmdbBaseUrl}/3/genre/movie/list`)
+    .pipe(
+      map(({ genres }) => genres),
+      shareReplay(1),
+    );
 ```
 
 ```ts
@@ -96,8 +99,8 @@ readonly genres$ = this.movieService.genres$;
 </details>
 
 Now it's time to finally start pre-fetching our resource.
-The goal is to implement an `APP_INITIALIZER` that uses the `MovieService`
-kickstart the request to the genres endpoint.
+The goal is to add `provideAppInitializer` to the `providers` in `apps/movies/src/app/app.config.ts`. It uses the
+`MovieService` to kickstart the request to the genres endpoint.
 
 For this, we just need to `subscribe` to the `genres$` Observable, as this will
 start the http call.
@@ -108,24 +111,26 @@ start the http call.
 ```ts
 // apps/movies/src/app/app.config.ts
 
-@NgModule({
-  /*other stuff*/
+import {
+  ApplicationConfig,
+  inject,
+  provideAppInitializer,
+} from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { MovieService } from '@movies/movies/data-access';
+
+// ...
+
+export const appConfig: ApplicationConfig = {
   providers: [
-    /*other stuff*/,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: () => {
-        const movieService = inject(MovieService);
-        return () => {
-          // start the http call
-          movieService.genres$.subscribe();
-        };
-      },
-      multi: true,
-    },
-  ]
-})
-export class AppModule {}
+    provideEnvironment(environment),
+    provideAppInitializer(() => {
+      // start the http call
+      inject(MovieService).genres$.subscribe();
+    }),
+    // ...other providers
+  ],
+};
 ```
 
 </details>
@@ -134,7 +139,7 @@ export class AppModule {}
 Well done, it's time to validate our improvements!
 Repeat the analysis process from before by doing a performance profile of a refresh.
 
-You should now see the timing of the network request has moved from `AppShellComponentTemplate` to
+You should now see the timing of the network request has moved from `AppShellComponent_Template` to
 `bootstrap`, very nice job!!
 
 ![genre-request-initializer](images/network/genre-request-initializer.png)

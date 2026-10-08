@@ -83,7 +83,7 @@ protected readonly favoritesForm = form(this.favorites, (favorites) => {
 
 An array field tree is iterable: `@for (favorite of favoritesForm; ...)` gives you one field tree per item.
 
-Replace the sample row in the template with a `@for` over `favoritesForm`:
+Replace the sample row in the template with a `@for` over `favoritesForm`. Keep the **Delete** button as it is for now.
 
 * `track favorite`: track the field, not the `$index`
 * show the title from `favorite.title().value()`
@@ -98,7 +98,7 @@ Replace the sample row in the template with a `@for` over `favoritesForm`:
 
 <h2>My Movies</h2>
 <div class="my-movies-list">
-  @for (favorite of favoritesForm; track favorite; let i = $index) {
+  @for (favorite of favoritesForm; track favorite) {
     <div class="movie-item">
       <span class="movie-title">{{ favorite.title().value() }}</span>
       <div class="form-group">
@@ -112,7 +112,7 @@ Replace the sample row in the template with a `@for` over `favoritesForm`:
           }
         }
       </div>
-      <button class="btn btn__icon" type="button" (click)="removeMovie(i)">
+      <button class="btn btn__icon" type="button">
         <fast-svg name="delete"></fast-svg>
         Delete
       </button>
@@ -127,9 +127,10 @@ Replace the sample row in the template with a `@for` over `favoritesForm`:
 
 Adding and removing is just updating the array signal. The form follows.
 
-* in the submission `action`, replace the `movieService.setFavorites(...)` call from exercise 3 with
-  `this.favorites.update(...)`, appending the new favorite
-* add a `removeMovie(index)` method that filters the item out of the array, and call it from the **Delete** button
+* in the submission `action`, after `addFavorite()` succeeded, append the new favorite with
+  `this.favorites.update(...)`
+* add a `removeMovie(index)` method that filters the item out of the array
+* in the template, add `let i = $index` to the `@for` and call `removeMovie(i)` from the **Delete** button
 
 <details>
   <summary>Add & remove</summary>
@@ -147,6 +148,18 @@ removeMovie(index: number): void {
 }
 ```
 
+```html
+<!-- libs/movies/feature-my-movies-v2/src/lib/my-movie-list-v2/my-movie-list-v2.component.html -->
+
+@for (favorite of favoritesForm; track favorite; let i = $index) {
+  <!-- ... -->
+  <button class="btn btn__icon" type="button" (click)="removeMovie(i)">
+    <fast-svg name="delete"></fast-svg>
+    Delete
+  </button>
+}
+```
+
 </details>
 
 ## 5. Persist with an `effect`
@@ -157,8 +170,9 @@ the whole list is valid, store it with `movieService.setFavorites()`.
 `this.favoritesForm().valid()` is the state of the **root**: it is only valid if every comment of every item is valid.
 
 > Unlike `valueChanges`, an `effect` runs once right away: on load it writes back the list it just read from
-> `localStorage`. That's expected and harmless. Don't try to skip it with `favoritesForm().dirty()`: adding and
-> removing favorites updates the signal from code, which doesn't mark the form dirty, so removals would never be saved.
+> `localStorage` (if every comment is valid). That's expected and harmless. Don't try to skip it with
+> `favoritesForm().dirty()`: adding and removing favorites updates the signal from code, which doesn't mark the form
+> dirty, so removals would never be saved.
 
 <details>
   <summary>effect</summary>
@@ -185,7 +199,8 @@ Compare it with `ngOnInit` in the old `MyMovieListComponent`: no `valueChanges`,
 
 Remove the debug output from exercise 1 if you like. Then serve the application:
 
-* your favorites show up, the same ones as on the old page; a liked movie without a comment asks for one
+* your favorites show up, the same ones as on the old page; a liked movie without a comment asks for one. Give it a
+  comment of at least 5 characters: as long as one comment is invalid, nothing is stored
 * edit a comment and check `my-movies` in the **Application** tab of the DevTools: it updates as you type
 * shorten a comment to `abc`: the error shows up and the storage is **not** updated
 * delete a movie, add a movie: the list and the storage follow
@@ -303,7 +318,7 @@ export class MyMovieListV2Component {
       submission: {
         action: async (addForm) => {
           const { movie, comment } = addForm().value();
-          const favorite = { ...movie!, comment };
+          const favorite = { ...(movie as TMDBMovieModel), comment };
 
           try {
             await this.movieService.addFavorite(favorite);

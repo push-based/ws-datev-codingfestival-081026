@@ -20,13 +20,10 @@ npm -v
 ## 1. Open Project in IDE
 
 > [!NOTE]
-> If you use `vscode` you can run it directly from the terminal by executing `code ./path-to-project`.
+> If you use `vscode` you can open it directly from the terminal by executing `code ./path-to-project`.
 
-```bash
-code ./path-to-project
-```
-
-Install the **Nx Console** extension for your IDE (VSCode: `nrwl.angular-console`, also available for JetBrains IDEs).
+Install the recommended extensions when your IDE asks for them (`.vscode/extensions.json`: Nx Console, Angular
+Language Service, ESLint, Prettier). JetBrains IDEs: install the **Nx Console** plugin.
 
 ## 2. Install dependencies
 
@@ -38,44 +35,17 @@ npm install
 > The workspace uses the local Nx installation, run every command with `npx nx ...`.
 > Optionally install Nx globally (`npm i -g nx`) to drop the `npx`.
 
-## 3. serve application
+## 3. Serve application
 
 ```bash
 npx nx serve movies
 ```
 
-application will be served at `localhost:4200` as default and redirects to `/list/popular`
+The application will be served at `localhost:4200` as default and redirects to `/list/popular`.
 
 > [!TIP]
-> you can let Nx open your browser with the `--open` argument
+> You can let Nx open your browser with the `--open` argument
 
 ```bash
 npx nx serve movies --open
 ```
-
-## 4. Make sure the IDE, eslint & prettier are set up correctly
-
-### 4.1 VSCode
-
-```bash
-CTRL + P
-
-ext install esbenp.prettier-vscode
-
-ext install dbaeumer.vscode-eslint
-
-```
-// .vscode/settings.json
-
-```json
-
-{
-  "editor.formatOnSave": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  },
-  "eslint.format.enable": true,
-}
-```
-
-

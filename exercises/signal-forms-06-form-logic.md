@@ -132,8 +132,7 @@ Users who have watched the movie can rate it. Extend the model:
 * `watched`: `boolean`, a checkbox
 * `rating`: `number | null`, from 1 to 10, only when `watched` is checked
 
-The initial value now appears in three places (the signal, `reset()`, and soon the template). Move it into a
-constant `emptyAddModel`.
+The initial value now appears in two places (the signal and `reset()`). Move it into a constant `emptyAddModel`.
 
 In the schema:
 
@@ -158,6 +157,7 @@ In the template:
 
 import { hidden, max, min } from '@angular/forms/signals';
 
+// above the class
 interface AddMovieModel {
   movie: TMDBMovieModel | null;
   comment: string;
@@ -172,6 +172,7 @@ const emptyAddModel: AddMovieModel = {
   rating: null,
 };
 
+// in the class
 protected readonly addModel = signal<AddMovieModel>(emptyAddModel);
 
 // in the schema
@@ -248,7 +249,11 @@ protected readonly favorites = signal<FavoriteMovie[]>(
 
 // in the submission action
 const { movie, comment, watched, rating } = addForm().value();
-const favorite = { ...movie!, comment, rating: watched ? rating : null };
+const favorite = {
+  ...(movie as TMDBMovieModel),
+  comment,
+  rating: watched ? rating : null,
+};
 ```
 
 ```html
@@ -268,8 +273,8 @@ Serve the application. Check **I've watched it**, try to save without a rating, 
 
 ## Bonus: rules that only apply sometimes
 
-`hidden` and `disabled` switch whole fields. Sometimes you only want to switch **rules**. `applyWhen(path, condition,
-schema)` applies a schema only while the condition is true.
+`hidden` and `disabled` switch whole fields. Sometimes you only want to switch **rules**.
+`applyWhen(path, condition, schema)` applies a schema only while the condition is true.
 
 Add this rule: when a watched movie gets 3 stars or less, the comment needs at least 20 characters
 (`Only 3 stars or less? Tell us why in at least 20 characters`).
@@ -288,7 +293,8 @@ applyWhen(
   ({ value }) => value().watched && (value().rating ?? 10) <= 3,
   (movie) => {
     minLength(movie.comment, 20, {
-      message: 'Only 3 stars or less? Tell us why in at least 20 characters',
+      message:
+        'Only 3 stars or less? Tell us why in at least 20 characters',
     });
   },
 );
@@ -296,7 +302,7 @@ applyWhen(
 
 </details>
 
-> For a single rule, every validator also takes a `when` option: `minLength(path.comment, 20, { when: ... })`.
+> For a single rule, every built-in validator also takes a `when` option: `minLength(path.comment, 20, { when: ... })`.
 
 Congratulations! My Movies is a Signal Form now: one signal per form, a typed schema for all the rules, a custom
 control with a signal contract, and not a single subscription 🎉
@@ -447,7 +453,7 @@ export class MyMovieListV2Component {
         action: async (addForm) => {
           const { movie, comment, watched, rating } = addForm().value();
           const favorite = {
-            ...movie!,
+            ...(movie as TMDBMovieModel),
             comment,
             rating: watched ? rating : null,
           };

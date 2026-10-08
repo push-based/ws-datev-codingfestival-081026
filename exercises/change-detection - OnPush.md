@@ -10,7 +10,8 @@ how to optimize our applications runtime performance by using `ChangeDetectionSt
 
 ## 0. Using `ChangeDetectionStrategy.OnPush` disclaimer
 
-By default, all components are using `ChangeDetectionStrategy.Default`.
+Since Angular 22, components use `ChangeDetectionStrategy.OnPush` by default, but the components of this app are
+pinned to `ChangeDetectionStrategy.Eager`.
 This means a component will be checked (template bindings will be re-evaluated) every time any action happens on the page.
 This can cause severe performance issues.
 
@@ -22,11 +23,10 @@ Let's start by introducing `ChangeDetectionStrategy.OnPush` to a `Leaf` componen
 This will also help to get a deeper understanding of rendering cycles in the context of the `ComponentTree`.
 
 * add the `<dirty-check />` component to the `MovieCardComponent`s template (if not done before)
-* serve the application & note the initial values
-* interact with the app and observe the counter in the `MovieCardComponent`
+* serve the application, interact with the app and observe the counter in the `MovieCardComponent`
 * apply `ChangeDetectionStrategy.OnPush` to `MovieCardComponent`
-* serve the application again and observe how the dirty check amount is decreasing ;)
-* observe how only the hovered movie cards counter is increasing but not the others
+* hover over the movie cards again: the counters stop — and the tilt breaks, because the `TiltDirective` writes a
+  plain field in a `fromEvent` subscription. The [signals exercise](./change-detection%20-%20signals.md) fixes that.
 
 <details>
     <summary>MovieCardComponent OnPush</summary>
@@ -42,7 +42,6 @@ This will also help to get a deeper understanding of rendering cycles in the con
 
 ```ts
 // libs/movies/ui-movie-list/src/lib/movie-card/movie-card.component.ts
-import { ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   /* */
@@ -77,52 +76,31 @@ Let's do one more simple but significant change and make our `AppComponent` use 
     </app-shell>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [RouterOutlet, AppShellComponent, DirtyCheckComponent],
 })
+export class AppComponent {}
 ```
 
 </details>
 
-Serve the application, note how the counter will still increase on any interaction, but the amount it increases is
-way lower than before. This is because the Component now only re-renders when being on a dirty-path.
+Serve the application, note how the counter increases way less than before (hovering doesn't increase it anymore).
+This is because the Component now only re-renders when being on a dirty-path.
 
-> [!NOTICE]
-> **REMEMBER** the bug where you have to just _click or hover something_ in the app until your changes are displayed
-> on the screen? Well, you've just introduced it 🥳🥳🥳. If you face an empty screen, just interact with the page - your movies will
-> be rendered afterwards.
+> [!IMPORTANT]
+> **REMEMBER** the bug where you have to just _click something_ in the app until your changes are displayed
+> on the screen? Well, you've just introduced it 🥳🥳🥳. If you face an empty screen, just click something (e.g. the
+> dark mode toggle) - your movies will be rendered afterwards.
 
-> [!NOTICE]
-> We will fix this issue in the next exercise, so don't worry.
+> [!NOTE]
+> Signals in `MovieListPageComponent` fix this — see step 3 of the
+> [zoneless exercise](./change-detection%20-%20zoneless.md#3-fix-it-with-signals).
 
 ### 3. BONUS: more ChangeDetectionStrategy.OnPush
 
 > [!NOTE]
-> This is a bonus exercise, you don't need to complete
+> This is a bonus exercise, you don't need to complete it.
 
 Try to think about other components that would benefit from the `OnPush` `ChangeDetectionStrategy` and apply it.
 Make sure to first use the `<dirty-check />` component in order to measure the improvement.
 
 Feel free to ask questions if anything unexpected happens.
-
-### 4. BONUS: Schematics Pro Tip
-
-> [!NOTE]
-> This is a bonus exercise, you don't need to complete
-
-You can generate components with `OnPush` by default if you add the following to the `generators` section of `nx.json`:
-
-<details>
-    <summary>setup schematics to add OnPush automatically</summary>
-
-```json
-{
-  "generators": {
-    "@nx/angular:component": {
-      // other stuff is here as well
-      "changeDetection": "OnPush"
-    }
-  }
-}
-```
-
-</details>
-

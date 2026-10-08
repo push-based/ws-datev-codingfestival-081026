@@ -131,7 +131,7 @@ export class MovieService {
    *
    * Pretends to save a new favorite on a server: it answers after one second, and the
    * "moderation" rejects comments that contain the word "spoiler" by throwing an error,
-   * just like an HTTP call that fails. Storing the list stays the component's job.
+   * just like an HTTP call that fails. Accepted favorites are appended to the stored list.
    */
   async addFavorite(
     favorite: TMDBMovieModel & { comment: string },
@@ -140,6 +140,7 @@ export class MovieService {
     if (/spoiler/i.test(favorite.comment)) {
       throw new Error('Our moderators rejected this comment: no spoilers!');
     }
+    this.setFavorites([...this.getFavorites(), favorite]);
   }
 
   getFavorites(): (TMDBMovieModel & { comment: string })[] {

@@ -6,18 +6,20 @@ This allows the browser to download critical information right away.
 
 This will ultimately improve the LCP & sometimes CLS for our application.
 
+> [!IMPORTANT]
+> Use the dev server (`npx nx serve movies`): the production build inlines the Google Fonts CSS with different font URLs.
+
 ## 0. Measure the current state
 
 Get aware of the resources our browser needs to have a stable and fast first paint.
 
 ### 0.1. Measure CLS
 
-Use the web vitals extension to see CLS problems on one of the movie detail pages, e.g. `http://localhost:4200/movie/533535`.
+Use the `Live metrics` view of the `Performance` tab to see CLS problems on one of the movie detail pages, e.g. `http://localhost:4200/movie/533535`.
 
 You should notice it reports a bunch of `text` nodes that jump around.
 
-Inspect it either with the performance recording tool by refreshing the page with a clean cache,
-or by looking at the `Live Metrics` section in the performance tab.
+Inspect it by refreshing the page with a clean cache.
 
 ![live-metrics-cls.png](images/network/live-metrics-cls.png)
 
@@ -32,10 +34,10 @@ Also, always make sure to refresh the page without cache!
 
 ### 0.2. Measure LCP
 
-The web vitals extension should give you a hint about what is the LCP of one of the list pages, e.g. `http://localhost:4200/list/popular`.
+The `Live metrics` view tells you what is the LCP of one of the list pages, e.g. `http://localhost:4200/list/popular`.
 It is most probably the first image of the grid.
 
-Copy the path to that image and note it down!
+Copy its URL (right-click → `Copy image address`), you need it in step 1.2.
 
 ## 1. Use `preload` to load critical resources
 
@@ -46,7 +48,8 @@ Let's use `preload` to improve our CLS & LCP based on our measurements from befo
 We know that the lazy loaded fonts cause CLS issues. Go again to the movie-detail page
 you've analyzed before, e.g. `http://localhost:4200/movie/533535`.
 
-Search for the `fonts` that are being downloaded for the page and write them down.
+Search for the `fonts` that are being downloaded for the page. Copy their URLs from your own Network tab — Google
+changes the version in the path from time to time.
 
 ![preload-search-fonts.png](images/network/preload-search-fonts.png)
 
@@ -55,11 +58,11 @@ Search for the `fonts` that are being downloaded for the page and write them dow
 
 ```text
 
-https://fonts.gstatic.com/s/poppins/v23/pxiEyp8kv8JHgFVrJJfecnFHGPc.woff2
-https://fonts.gstatic.com/s/poppins/v23/pxiByp8kv8JHgFVrLDz8Z1xlFd2JQEk.woff2
-https://fonts.gstatic.com/s/poppins/v23/pxiByp8kv8JHgFVrLCz7Z1xlFd2JQEk.woff2
-https://fonts.gstatic.com/s/poppins/v23/pxiDyp8kv8JHgFVrJJLmy15VF9eOYktMqg.woff2
-https://fonts.gstatic.com/s/poppins/v23/pxiGyp8kv8JHgFVrJJLucHtAOvWDSA.woff2
+https://fonts.gstatic.com/s/poppins/v24/pxiEyp8kv8JHgFVrJJfecnFHGPc.woff2
+https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLDz8Z1xlFd2JQEk.woff2
+https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLCz7Z1xlFd2JQEk.woff2
+https://fonts.gstatic.com/s/poppins/v24/pxiDyp8kv8JHgFVrJJLmy15VF9eOYktMqg.woff2
+https://fonts.gstatic.com/s/poppins/v24/pxiGyp8kv8JHgFVrJJLucHtAOvWDSA.woff2
 
 ```
 
@@ -67,26 +70,26 @@ https://fonts.gstatic.com/s/poppins/v23/pxiGyp8kv8JHgFVrJJLucHtAOvWDSA.woff2
 
 
 For each of those links, create a `link rel="preload" href="{{font}}" as="font" type="font/woff2" crossorigin` and add it to the
-`index.html` of your app.
+`<head>` of `apps/movies/src/index.html`.
 
 <details>
   <summary>Solution: preloaded fonts</summary>
 
 ```html
 
-<link rel="preload" href="https://fonts.gstatic.com/s/poppins/v23/pxiEyp8kv8JHgFVrJJfecnFHGPc.woff2"
+<link rel="preload" href="https://fonts.gstatic.com/s/poppins/v24/pxiEyp8kv8JHgFVrJJfecnFHGPc.woff2"
       as="font" type="font/woff2"
       crossorigin />
-<link rel="preload" href="https://fonts.gstatic.com/s/poppins/v23/pxiByp8kv8JHgFVrLDz8Z1xlFd2JQEk.woff2"
+<link rel="preload" href="https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLDz8Z1xlFd2JQEk.woff2"
       as="font" type="font/woff2"
       crossorigin />
-<link rel="preload" href="https://fonts.gstatic.com/s/poppins/v23/pxiByp8kv8JHgFVrLCz7Z1xlFd2JQEk.woff2"
+<link rel="preload" href="https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLCz7Z1xlFd2JQEk.woff2"
       as="font" type="font/woff2"
       crossorigin />
-<link rel="preload" href="https://fonts.gstatic.com/s/poppins/v23/pxiDyp8kv8JHgFVrJJLmy15VF9eOYktMqg.woff2"
+<link rel="preload" href="https://fonts.gstatic.com/s/poppins/v24/pxiDyp8kv8JHgFVrJJLmy15VF9eOYktMqg.woff2"
       as="font" type="font/woff2"
       crossorigin />
-<link rel="preload" href="https://fonts.gstatic.com/s/poppins/v23/pxiGyp8kv8JHgFVrJJLucHtAOvWDSA.woff2"
+<link rel="preload" href="https://fonts.gstatic.com/s/poppins/v24/pxiGyp8kv8JHgFVrJJLucHtAOvWDSA.woff2"
       as="font" type="font/woff2"
       crossorigin />
 
@@ -107,16 +110,16 @@ If something is wrong with preloading, the console should give you a warning abo
 Okay, this will be quite a hacky one. But it'll do the trick for now - and could potentially
 be optimized in future, so it's not worthless :).
 
-I hope you've noted down the path to the LCP on the list page you've analyzed.
+Use the URL of the LCP image you've copied in step 0.2.
 
-For that LCP image, also create a `link rel="preload" as="image" href="{{ path-you-noted }}"` and insert it into the 
-index.html.
+For that LCP image, also create a `link rel="preload" as="image" fetchpriority="high" href="{{ url }}"` and insert it into the
+`<head>` of `apps/movies/src/index.html`. Without `fetchpriority="high"` an image preload gets a low priority.
 
 <details>
   <summary>Solution</summary>
 
 ```html
-<link rel="preload" href="{{ your image that youve noted down }}" as="image" />
+<link rel="preload" href="{{ the image URL you've copied }}" as="image" fetchpriority="high" />
 
 
 ```
@@ -136,6 +139,8 @@ requested :).
 The improvement is probably minor with the current setup. It will be more prominent on
 slower networks (you could throttle if you like).
 
+Why hacky? The preload runs on every route, and the popular list changes daily — tomorrow it may be the wrong poster.
+
 ## 2. Use `prefetch` to preemptively fetch resources
 
 You can use `prefetch` to make a hint to the browser that the resource will be needed for other pages.
@@ -145,15 +150,15 @@ We need a backup image for movies that don't have a poster so let's fetch it.
 Your task is to `prefetch` the `assets/images/no_poster_available.jpg` image by
 using `link` tag.
 
-Add it to the `index.html` files `head` tag.
+Add it to the `<head>` of `apps/movies/src/index.html`.
 
 <details>
     <summary>show solution</summary>
 
-Go to `index.html` and extend `<head>` tag with following:
+Go to `apps/movies/src/index.html` and extend `<head>` tag with following:
 
 ```html
-<!-- index.html -->
+<!-- apps/movies/src/index.html -->
 
 <link rel="prefetch" href="assets/images/no_poster_available.jpg" />
 ```
@@ -162,9 +167,9 @@ Go to `index.html` and extend `<head>` tag with following:
 
 Great, you can verify your changes by inspecting the network traffic of your application on a refresh.
 
-You should see that the request for the prefetched resource is happening right after the javascript bundles are loaded.
+You should see that the request for the prefetched resource starts together with the other resources from the `<head>`, with a low priority.
 
 ![prefetch-no-poster-available](images/network/prefetch-no-poster-available.png)
 
-If you make sure that `no-poster-avilable` is actually being displayed, you will also be able
+If you make sure that `no_poster_available.jpg` is actually being displayed, you will also be able
 to see the network tab requesting it from the cache.

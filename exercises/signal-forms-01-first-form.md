@@ -4,7 +4,7 @@ The **My Movies** page (`/my-movies`) lets you search a movie, write a comment a
 It is built with **Reactive Forms**: a `FormGroup` for the "add a movie" form, a `FormArray` for the list and a
 `ControlValueAccessor` for the movie search.
 
-Over the next six exercises we build the same page again with **Signal Forms** (`@angular/forms/signals`), from
+In this and the next five exercises we build the same page again with **Signal Forms** (`@angular/forms/signals`), from
 scratch: **My Movies (Signal Forms)**, at `/my-movies-v2`. It's already in the side menu, and the old page stays
 untouched, so you can compare both at any time.
 

@@ -63,13 +63,13 @@ Signals & Observables
 
 Signal Change Detection
 
+- [Change Detection: Dirty Check](./exercises/change-detection%20-%20Dirty%20Check.md)
 - [Change Detection: Signals](./exercises/change-detection%20-%20signals.md)
 - [Change Detection: Zoneless](./exercises/change-detection%20-%20zoneless.md)
 
 Bonus
 
 - [Signal - Automatic Migration](exercises/signal-migration.md)
-- [Change Detection: Dirty Check](./exercises/change-detection%20-%20Dirty%20Check.md)
 - [Change Detection: OnPush](./exercises/change-detection%20-%20OnPush.md)
 
 ### Block 3: Signal Forms
@@ -86,14 +86,14 @@ library, `libs/movies/feature-my-movies-v2`. The Reactive Forms version (`/my-mo
 
 ### Block 4: AI-Assisted Performance Engineering
 
-Flame Charts, Network & Images
-
 - [Performance Tab & Flame Charts](./exercises/performance-tab-flame-charts.md)
+- [AI: Chrome DevTools MCP](./exercises/ai-devtools-mcp.md)
+- [AI: Performance Skills](./exercises/ai-performance-skills.md)
+
+Optional: Network & Images
+
 - [Network: Preconnect](./exercises/network-resource-hints-preconnect.md)
 - [Network: Preload & Prefetch](./exercises/network-resource-hints-preload-prefetch.md)
 - [Network: Lazy Loading Resources](./exercises/network-lazy-loading.md)
-- [Network: Prefetch LCP Data](./exercises/network-prefetch-lcp-data.md)
-- 🚧 [Network: Image Optimization with NgOptimizedImage](./exercises/ng-optimized-images.md)
-
-- 🚧 Chrome DevTools MCP
-- 🚧 Performance Engineering Skills
+- [Network: Prefetch Data](./exercises/network-prefetch-lcp-data.md)
+- [Images: NgOptimizedImage](./exercises/ng-optimized-images.md)

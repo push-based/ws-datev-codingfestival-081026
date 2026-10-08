@@ -6,7 +6,7 @@ wrong.
 ## Goal
 
 At the end of this exercise the "add a movie" form has a **schema** with validation rules and error messages.
-Errors show up at the right time, invalid data can't be saved, and invalid inputs get their red border back.
+Errors show up at the right time, invalid data can't be saved, and the comment gets its red border back.
 
 > The relevant files are:
 > - `libs/movies/feature-my-movies-v2/src/lib/my-movie-list-v2/my-movie-list-v2.component.ts`
@@ -174,7 +174,7 @@ input.ng-touched.ng-invalid {
 
 Reactive Forms add the `ng-*` status classes to every control. **Signal Forms don't add any classes by default.**
 You decide which classes you want with `provideSignalFormsConfig()`. Each class maps to a predicate that gets the
-bound field.
+field binding: its `state()` is the state of the bound field.
 
 Angular ships the classic `ng-*` classes as `NG_STATUS_CLASSES` in `@angular/forms/signals/compat`. Provide them in
 `app.config.ts`.

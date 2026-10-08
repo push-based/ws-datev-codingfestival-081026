@@ -8,7 +8,7 @@ Refactor `StarRatingComponent` and introduce `computed` to simplify some logic.
 
 ## Convert `_rating` to a signal
 
-Go to `StarRatingComponent` and replace the `_rating` variable with a signal, and update all usages to properly use the signal.
+Go to `StarRatingComponent` (`libs/shared/ui-design-system/src/lib/pattern/star-rating/star-rating.component.ts`) and replace the `_rating` variable with a signal, and update all usages to properly use the signal.
 
 <details>
   <summary>_rating to signal</summary>
@@ -16,7 +16,13 @@ Go to `StarRatingComponent` and replace the `_rating` variable with a signal, an
 ```diff
 // libs/shared/ui-design-system/src/lib/pattern/star-rating/star-rating.component.ts
 
-+import { signal } from '@angular/core';
+-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
++import {
++  ChangeDetectionStrategy,
++  Component,
++  Input,
++  signal,
++} from '@angular/core';
 
 - private _rating = 5;
 + private _rating = signal(5);
@@ -46,10 +52,20 @@ Move the logic out of Input setter into a computed signal.
 <details>
   <summary>stars to computed signal</summary>
 
+The `starsArray` constant is not needed anymore — delete it.
+
 ```diff
 // libs/shared/ui-design-system/src/lib/pattern/star-rating/star-rating.component.ts
 
-+import { computed } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
++  computed,
+  Input,
+  signal,
+} from '@angular/core';
+
+-const starsArray: number[] = new Array(numStars).fill(1);
 
 -stars: number[] = starsArray;
 +stars = computed(() => {
@@ -96,8 +112,6 @@ Move the logic out of Input setter into a computed signal.
 
 ```diff
 // libs/shared/ui-design-system/src/lib/pattern/star-rating/star-rating.component.ts
-
-+import { computed } from '@angular/core';
 
 -tooltipText = `0 average rating`;
 +tooltipText = computed(() => `${this._rating()} average rating`);

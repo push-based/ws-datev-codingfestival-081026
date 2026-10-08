@@ -1,11 +1,13 @@
 # Network: Lazy Load Resources
 
+All changes happen in the template of `libs/movies/ui-movie-list/src/lib/movie-card/movie-card.component.ts`.
+
 ## 0. Investigate the current state 
 
-Refresh the app (with / without cache - u probably should try both). 
+Refresh the app (with / without cache - you should try both). 
 Also see how the app behaves when throttling is enabled.
 
-If you investigate the network tab you should see all images are loaded eagerly & with high priority.
+If you investigate the network tab you should see all posters are requested at once — also the ones far below the visible area.
 
 ![lazyload-eager-images.png](./images/network/lazyload-eager-images.png)
 
@@ -35,9 +37,9 @@ should be loaded `loading="eager"`.
   tilt
   [tiltDegree]="5"
   class="movie-image"
-  [alt]="movie().title"
-  [src]="movie().poster_path | movieImage: 780"
-  [attr.loading]="index() < 1 ? 'eager' : 'lazy'"
+  [alt]="movie.title"
+  [src]="movie.poster_path | movieImage: 780"
+  [attr.loading]="index < 1 ? 'eager' : 'lazy'"
 />
 
 ```
@@ -49,7 +51,7 @@ Measure again, your LCP should be improved now. Make sure you don't hit the cach
 
 ## 3. Prioritize LCP Candidate
 
-You can also put the `[attr.fetchpriority]` here to enforce a high priority on the lcp image, e.g. `index() < 1 ? 'high' : 'low'`.
+You can also put the `[attr.fetchpriority]` here to enforce a high priority on the lcp image, e.g. `index < 1 ? 'high' : 'low'`.
 
 <details>
   <summary>Solution: Prioritize LCP Candidate</summary>
@@ -60,13 +62,14 @@ You can also put the `[attr.fetchpriority]` here to enforce a high priority on t
   tilt
   [tiltDegree]="5"
   class="movie-image"
-  [alt]="movie().title"
-  [src]="movie().poster_path | movieImage: 780"
-  [attr.fetchpriority]="index() < 1 ? 'high' : 'low'"
+  [alt]="movie.title"
+  [src]="movie.poster_path | movieImage: 780"
+  [attr.loading]="index < 1 ? 'eager' : 'lazy'"
+  [attr.fetchpriority]="index < 1 ? 'high' : 'low'"
 />
 
 ```
 
 </details>
 
-Measure again, your LCP should be improved now. Make sure you don't hit the cache when measuring before/after!
+Measure again (without cache).

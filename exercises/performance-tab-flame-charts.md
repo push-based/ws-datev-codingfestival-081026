@@ -48,12 +48,12 @@ In order to identify the `LCP` you might want to consider taking a look at the `
 
 ## 2. Find out how long it takes from visible app-skeleton until list is visible
 
-To solve this task you will again need to take a look at the `Screenshot` section.
+To solve this task you need to take a look at the `Screenshots` section (the filmstrip at the top of the recording).
 
-> [!NOTICE]
+> [!NOTE]
 > **REMEMBER** to tick the checkbox `Screenshots` in the `Performance` tab if it's not already ticked.
 
-Your fast task for this exercise will be to identify the point in time when the initial **loading screen disappears**.
+Your first task for this exercise will be to identify the point in time when the initial **loading screen disappears**.
 
 ### 2.1 **Initial Loading Screen**
 
@@ -65,7 +65,7 @@ If you have identified it, please go ahead and find the timing when the **movie 
 
 ![movie-list-data](images/performance-tab/movie-list-data.png)
 
-Please mark the corresponding area between those two point in times and report
+Please mark the corresponding area between those two points in time and report
 the values shown in the `Summary` section.
 
 > [!TIP]
@@ -82,14 +82,14 @@ the values shown in the `Summary` section.
 
 ![summary](images/performance-tab/summary.png)
 
-## 3. Find MovieListComponent bootstrap
+## 3. Find the MovieListPageComponent creation
 
-In this exercise you should use the `search` functionality to search for the
-time when the `MovieListPageComponent` is getting bootstrapped.
+In this exercise you should use the `search` functionality to find the
+time when the `MovieListPageComponent` is created.
 
 Press `Ctrl + F` (Mac: `⌘ CMD + F`) in order to conduct a search in the flame charts. 
 
-Find and report the point in time, when `MovieListPageComponent` is getting bootstrapped.
+Search for `MovieListPageComponent` and select the `MovieListPageComponent_Factory` match.
 
 <details>
   <summary>Show Help</summary>
@@ -98,9 +98,11 @@ Find and report the point in time, when `MovieListPageComponent` is getting boot
 
 </details>
 
-## 4. Throttle your CPU
+## 4. Throttle your CPU and measure a navigation click (INP)
 
-Play around with CPU throttling. 
+### 4.1 Throttle your CPU
+
+Select `4x slowdown` in the `CPU` throttling dropdown.
 
 Chrome should allow for an up to `20x CPU throttling`. 
 Depending on your hardware it makes sense to throttle your system while doing performance tests.
@@ -112,19 +114,14 @@ Keep that setting active for the next measurements. You can also always compare 
 unthrottled measurements in the future.
 
 > [!WARNING]
-> setting throttling will constantly consume power from your machine. Chrome will simply put
-> a ton of work on that thread. Make sure to disable throttling when not needed.
+> Throttling makes everything in this tab slow. Make sure to disable throttling when you're done measuring.
 
-## 5. Measure INP / Interaction times
+### 4.2 Measure INP / Interaction times on route switch
 
-Start a performance recording for different interactions. Make sure to investigate always
-a single interaction at once. You want to create multiple recordings.
+Start a recording (`Record`, no reload), click one item in the sidebar (e.g. `Top Rated`) and stop the recording.
+Always record a single interaction at once.
 
-### 5.1 Measure INP / Interaction times on route switch
-
-Start to measure the interaction time when switching the route via the sidebar.
-
-You should be able to see the `Interaction` pane, showing you the exact timings of the
+You should be able to see the `Interactions` track, showing you the exact timings of the
 pointer event.
 
 ![route-click-interaction.png](images/performance-tab/route-click-interaction.png)
@@ -139,15 +136,26 @@ suspicious that shouldn't happen on the click event :).
 
 </details>
 
-### 5.2 Measure INP / Interaction times on other interactions
-Optionally, analyze other interactions, and try to understand what you see there, such as:
+<details>
+  <summary>Solution</summary>
+
+`AppShellComponent.trackNavigation` calls `TrackingService.trackEvent` (`libs/shared/utils/src/lib/tracking.service.ts`)
+on every sidebar click: a loop with 10 million iterations inside the click handler.
+
+</details>
+
+## If you have time
+
+### 5. Measure INP / Interaction times on other interactions
+
+Analyze other interactions, and try to understand what you see there, such as:
 
 * Typing in the search-bar
 * Opening/closing the search-bar
 * Hover in movie-card to trigger the tilt effect
 * Navigating to a detail view
 
-## 6. Compare consequent recordings
+### 6. Compare consecutive recordings
 
 Go ahead and do another bootstrap recording as described in
 step 1 of this exercise.
@@ -165,12 +173,12 @@ why we always should do multiple recordings!
 
 ![multiple recordings](images/performance-tab/multiple-recordings.png)
 
-## 7. Save & import recordings
+### 7. Save & import recordings
 
 If you want to share your recording with others, the dev tools provide
 you with the feature to save an existing recording.
 
-Hit the export button and save the current recording in the disk.
+Hit the export button and save the current recording to disk.
 
 ![save recording](images/performance-tab/save-recording.png)
 
@@ -183,7 +191,7 @@ multiple recordings directly next to each other.
 
 ![import recording](images/performance-tab/import-recording.png)
 
-## 8. Bonus: Find optimisation potential
+### 8. Bonus: Find optimisation potential
 
 In this exercise you can now investigate the flame charts on your own and try to find suspicious tasks that
 potentially could be reduced, moved or erased completely.
